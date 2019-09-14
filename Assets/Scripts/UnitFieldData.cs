@@ -31,6 +31,11 @@ public class UnitFieldData
     public MinoData NextMino { get; private set; }
     public MinoData NextNextMino { get; private set; }
 
+    public int Score { get; private set; }
+
+    public UnitFieldState CurrentState { get; private set; }
+    private UnitFieldState m_RequestedState;
+
     /// <summary>
     /// これはプレイヤー1のデータである
     /// </summary>
@@ -66,55 +71,14 @@ public class UnitFieldData
     {
         var gameState = GameManager.Instance.CurrentState;
 
-        // 入力ステート受付
         switch (gameState)
         {
-            case GameManagerState.Input:
-                m_AutoDropTimeCount = 0;
+            case GameManagerState.GameStart:
                 break;
-            case GameManagerState.Put:
-                // 自動落下処理?
-                // 多分ここは、Putになった初回のフレームだけ呼び出すことになる
-                if (CheckExistAutoDropUnit())
-                {
-                    GameManager.Instance.RequestState(GameManagerState.AutoDrop);
-                } else
-                {
-                    GameManager.Instance.RequestState(GameManagerState.ChangeColor);
-                }
+            case GameManagerState.Game:
+                RequestState(UnitFieldState.Input);
                 break;
-            case GameManagerState.AutoDrop:
-                m_AutoDropTimeCount = 0;
-                ResetInputColorData();
-                break;
-            case GameManagerState.ChangeColor:
-                MixUnitColor();
-                // 白色が存在したら白を消してPutに戻る
-                if (CheckExistWhileUnit())
-                {
-                    DeleteWhiteUnit();
-                    GameManager.Instance.RequestState(GameManagerState.Put);
-                } else
-                {
-                    GameManager.Instance.RequestState(GameManagerState.CheckGameOver);
-                }
-                break;
-            case GameManagerState.CheckGameOver:
-                if (CheckPiledUpToTop())
-                {
-                    GameManager.Instance.RequestState(GameManagerState.GameEnd);
-                } else
-                {
-                    // ミノをずらして入力待ちに戻る
-                    CurrentMino = NextMino;
-                    NextMino = NextNextMino;
-                    NextNextMino = GenerateMinoData(false);
-                    CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
-
-                    GameManager.Instance.RequestState(GameManagerState.Input);
-                }
-                break;
-            default:
+            case GameManagerState.GameEnd:
                 break;
         }
     }
@@ -123,84 +87,333 @@ public class UnitFieldData
     {
         var gameState = GameManager.Instance.CurrentState;
 
-        // 入力ステート受付
         switch (gameState)
         {
-            case GameManagerState.Input:
-                // この中で操作に対する処理を行う
-                InputManagerState inputState;
-                if (m_IsPlayer1)
-                {
-                    inputState = GameManager.Instance.InputManager.inputPlayer1;
-                }
-                else
-                {
-                    inputState = GameManager.Instance.InputManager.inputPlayer2;
-                }
-
-                switch (inputState)
-                {
-                    case InputManagerState.Left:
-                        MoveLeft();
-                        break;
-                    case InputManagerState.Right:
-                        MoveRight();
-                        break;
-                    case InputManagerState.Rotate:
-                        Rotate();
-                        break;
-                    case InputManagerState.SoftDrop:
-                        SoftDrop();
-                        break;
-                    case InputManagerState.HardDrop:
-                        HardDrop();
-                        break;
-                    case InputManagerState.None:
-                        // 何もしない
-                        break;
-                }
-
-                // 自由落下も行う
-                m_AutoDropTimeCount += Time.deltaTime;
-                if (m_AutoDropTimeCount >= INPUT_TIME_PERIOD)
-                {
-                    m_AutoDropTimeCount = 0;
-                    SoftDrop();
-                }
-
-                // 操作と自由落下の処理が終わったら、着地判定を行う
-                if (CheckMinoPut())
-                {
-                    // ミノの配置を確定する
-                    DetermineMinoPos();
-
-                    // ゲームマネージャにPutステートをリクエストする
-                    GameManager.Instance.RequestState(GameManagerState.Put);
-                }
+            case GameManagerState.GameStart:
                 break;
-            case GameManagerState.AutoDrop:
-                m_AutoDropTimeCount += Time.deltaTime;
-                if (m_AutoDropTimeCount >= AUTO_DROP_TIME_PERIOD)
+            case GameManagerState.Game:
+                // ステートの変更
+                if (m_RequestedState != UnitFieldState.None)
                 {
-                    m_AutoDropTimeCount = 0;
-                    UpdateAutoDropUnit();
-
-                    // 自動落下するものが無くなったら遷移する
-                    if (!CheckExistAutoDropUnit())
+                    if (CurrentState != UnitFieldState.None)
                     {
-                        GameManager.Instance.RequestState(GameManagerState.ChangeColor);
+                        OnEndStateAtGame();
+                    }
+
+                    CurrentState = m_RequestedState;
+                    m_RequestedState = UnitFieldState.None;
+
+                    if (CurrentState != UnitFieldState.None)
+                    {
+                        OnStartStateAtGame();
                     }
                 }
+
+                OnUpdateStateAtGame();
                 break;
-            default:
+            case GameManagerState.GameEnd:
                 break;
         }
     }
 
     public void OnEndState()
     {
+        var gameState = GameManager.Instance.CurrentState;
+
+        switch (gameState)
+        {
+            case GameManagerState.GameStart:
+                break;
+            case GameManagerState.Game:
+                break;
+            case GameManagerState.GameEnd:
+                break;
+        }
+    }
+
+    public void RequestState(UnitFieldState state)
+    {
+        m_RequestedState = state;
+    }
+
+    #region StateMachine
+
+    private void OnStartStateAtGame()
+    {
+        switch (CurrentState)
+        {
+            case UnitFieldState.None:
+                break;
+            case UnitFieldState.Input:
+                OnStartStateAtGameInput();
+                break;
+            case UnitFieldState.Put:
+                OnStartStateAtGamePut();
+                break;
+            case UnitFieldState.AutoDrop:
+                OnStartStateAtGameAutoDrop();
+                break;
+            case UnitFieldState.ChangeColor:
+                OnStartStateAtGameChangeColor();
+                break;
+            case UnitFieldState.StartLaser:
+                OnStartStateAtGameStartLaser();
+                break;
+            case UnitFieldState.EndLaser:
+                OnStartStateAtGameEndLaser();
+                break;
+            case UnitFieldState.Delete:
+                OnStartStateAtGameDelete();
+                break;
+            case UnitFieldState.CheckGameOver:
+                OnStartStateAtGameCheckGameOver();
+                break;
+            case UnitFieldState.GameOver:
+                OnStartStateAtGameGameOver();
+                break;
+            case UnitFieldState.TimeUp:
+                OnStartStateAtGameTimeUp();
+                break;
+        }
+    }
+
+    private void OnUpdateStateAtGame()
+    {
+        switch (CurrentState)
+        {
+            case UnitFieldState.Input:
+                OnUpdateStateAtGameInput();
+                break;
+            case UnitFieldState.AutoDrop:
+                OnUpdateStateAtGameAutoDrop();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void OnEndStateAtGame()
+    {
+        switch (CurrentState)
+        {
+            case UnitFieldState.None:
+                break;
+            case UnitFieldState.Input:
+                break;
+            case UnitFieldState.Put:
+                break;
+            case UnitFieldState.AutoDrop:
+                break;
+            case UnitFieldState.ChangeColor:
+                break;
+            case UnitFieldState.Delete:
+                break;
+            case UnitFieldState.CheckGameOver:
+                break;
+            case UnitFieldState.GameOver:
+                break;
+        }
+    }
+
+    #region StartStateAtGame
+
+    private void OnStartStateAtGameInput()
+    {
+        m_AutoDropTimeCount = 0;
+    }
+
+    private void OnStartStateAtGamePut()
+    {
+        if (CheckExistAutoDropUnit())
+        {
+            RequestState(UnitFieldState.AutoDrop);
+        }
+        else
+        {
+            RequestState(UnitFieldState.ChangeColor);
+        }
+    }
+
+    private void OnStartStateAtGameAutoDrop()
+    {
+        m_AutoDropTimeCount = 0;
+        ResetInputColorData();
+    }
+
+    private void OnStartStateAtGameChangeColor()
+    {
+        if (CheckExistLaserBlock())
+        {
+            // 点火していないレーザーが存在している場合は点火ステートに遷移する
+            var laserState = GetAllLaserState();
+            if ((laserState & LaserState.Prepare) == LaserState.Prepare)
+            {
+                RequestState(UnitFieldState.StartLaser);
+                return;
+            }
+            else if ((laserState & LaserState.Fire) == LaserState.Fire)
+            {
+                Debug.Log("ApplyLaser");
+                ApplyLaserColor();
+            }
+        }
+
+        Debug.Log("Mix");
+        MixUnitColor();
+        if (CheckExistWhileUnit())
+        {
+            RequestState(UnitFieldState.Delete);
+        }
+        else
+        {
+            // 点火しているレーザーが存在している場合は消火ステートに遷移する
+            if (CheckExistLaserBlock())
+            {
+                var laserState = GetAllLaserState();
+                if ((laserState & LaserState.Fire) == LaserState.Fire)
+                {
+                    RequestState(UnitFieldState.EndLaser);
+                    return;
+                }
+            }
+
+            RequestState(UnitFieldState.CheckGameOver);
+        }
+    }
+
+    private void OnStartStateAtGameStartLaser()
+    {
+        Debug.Log("StartLaser");
+        SetAllLaserState(LaserState.Fire);
+        RequestState(UnitFieldState.ChangeColor);
+    }
+
+    private void OnStartStateAtGameEndLaser()
+    {
+        // Noneにすることでレーザーを通常ブロックとして扱うようにする
+        Debug.Log("EndLaser");
+        SetAllLaserState(LaserState.None);
+        ResetAllLaserColor();
+        RequestState(UnitFieldState.ChangeColor);
+    }
+
+    private void OnStartStateAtGameDelete()
+    {
+        DeleteWhiteUnit();
+        RequestState(UnitFieldState.Put);
+    }
+
+    private void OnStartStateAtGameCheckGameOver()
+    {
+        // 時間切れならタイムアップに遷移
+        if (GameManager.Instance.IsTimeUp())
+        {
+            RequestState(UnitFieldState.TimeUp);
+            return;
+        }
+
+        if (CheckPiledUpToTop())
+        {
+            RequestState(UnitFieldState.GameOver);
+        }
+        else
+        {
+            // ミノをずらして入力待ちに戻る
+            CurrentMino = NextMino;
+            NextMino = NextNextMino;
+            NextNextMino = GenerateMinoData(true);
+            CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
+
+            RequestState(UnitFieldState.Input);
+        }
+    }
+
+    private void OnStartStateAtGameGameOver()
+    {
+        GameManager.Instance.RequestState(GameManagerState.GameEnd);
+    }
+
+    private void OnStartStateAtGameTimeUp()
+    {
 
     }
+
+    #endregion
+
+    #region UpdateStateAtGame
+
+    private void OnUpdateStateAtGameInput()
+    {
+        InputManagerState inputState;
+        if (m_IsPlayer1)
+        {
+            inputState = GameManager.Instance.InputManager.inputPlayer1;
+        }
+        else
+        {
+            inputState = GameManager.Instance.InputManager.inputPlayer2;
+        }
+
+        switch (inputState)
+        {
+            case InputManagerState.Left:
+                MoveLeft();
+                break;
+            case InputManagerState.Right:
+                MoveRight();
+                break;
+            case InputManagerState.Rotate:
+                Rotate();
+                break;
+            case InputManagerState.SoftDrop:
+                SoftDrop();
+                break;
+            case InputManagerState.HardDrop:
+                HardDrop();
+                break;
+            case InputManagerState.None:
+                // 何もしない
+                break;
+        }
+
+        // 自由落下も行う
+        m_AutoDropTimeCount += Time.deltaTime;
+        if (m_AutoDropTimeCount >= INPUT_TIME_PERIOD)
+        {
+            m_AutoDropTimeCount = 0;
+            SoftDrop();
+        }
+
+        // 操作と自由落下の処理が終わったら、着地判定を行う
+        if (CheckMinoPut())
+        {
+            DetermineMinoPos();
+            RequestState(UnitFieldState.Put);
+        }
+    }
+
+    private void OnUpdateStateAtGameAutoDrop()
+    {
+        m_AutoDropTimeCount += Time.deltaTime;
+        if (m_AutoDropTimeCount >= AUTO_DROP_TIME_PERIOD)
+        {
+            m_AutoDropTimeCount = 0;
+            UpdateAutoDropUnit();
+
+            // 自動落下するものが無くなったら遷移する
+            if (!CheckExistAutoDropUnit())
+            {
+                RequestState(UnitFieldState.ChangeColor);
+            }
+        }
+    }
+
+    #endregion
+
+    #region EndStateAtGame
+    #endregion
+
+    #endregion
 
     /// <summary>
     /// ミノ生成(仮置き)
@@ -237,7 +450,7 @@ public class UnitFieldData
                 // 4×1のやつ
                 for (var i = 0; i < 4; i++)
                 {
-                    mino.Units[i, 1].SetCurrentData(color, false);
+                    mino.Units[i, 1].SetCurrentData(color, LaserState.None);
                 }
                 break;
             case MinoData.MinoShape._2_2:
@@ -246,12 +459,12 @@ public class UnitFieldData
                 {
                     for (var j = 0; j < 2; j++)
                     {
-                        mino.Units[i + 1, j + 1].SetCurrentData(color, false);
+                        mino.Units[i + 1, j + 1].SetCurrentData(color, LaserState.None);
                     }
                 }
                 break;
             case MinoData.MinoShape._1_1:
-                mino.Units[1, 1].SetCurrentData(color, true);
+                mino.Units[1, 1].SetCurrentData(color, LaserState.Prepare);
                 break;
         }
 
@@ -300,8 +513,6 @@ public class UnitFieldData
                 {
                     // フィールド上のブロックが存在すればアウト
                     var fieldUnit = Units[actY, actX];
-                    Debug.LogFormat("CheckMinoProtrude: minoPos:{0} fieldPos:{1}, minoColor:{2}, fieldColor:{3}",
-                        new Vector2Int(j, i), new Vector2Int(actX, actY), minoUnit.CurrentColor, fieldUnit.CurrentColor);
                     if (fieldUnit.CurrentColor != ColorData.None)
                     {
                         return false;
@@ -321,7 +532,6 @@ public class UnitFieldData
     /// </summary>
     private void MoveLeft()
     {
-        Debug.Log("Move Left");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x - 1, pos.y))
         {
@@ -335,7 +545,6 @@ public class UnitFieldData
     /// </summary>
     private void MoveRight()
     {
-        Debug.Log("Move Right");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x + 1, pos.y))
         {
@@ -349,7 +558,6 @@ public class UnitFieldData
     /// </summary>
     private void Rotate()
     {
-        Debug.Log("Rotate");
         CurrentMino.Rotate();
     }
 
@@ -358,7 +566,6 @@ public class UnitFieldData
     /// </summary>
     private void SoftDrop()
     {
-        //Debug.Log("Soft Drop");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x, pos.y + 1))
         {
@@ -372,7 +579,6 @@ public class UnitFieldData
     /// </summary>
     private void HardDrop()
     {
-        Debug.Log("Hard Drop");
         var pos = CurrentMino.Pos;
         while (CheckMinoProtrude(pos.x, pos.y + 1))
         {
@@ -388,7 +594,6 @@ public class UnitFieldData
     /// </summary>
     public bool CheckMinoPut()
     {
-        //Debug.Log("MinoPos: " + CurrentMino.Pos);
         if (CurrentMino == null)
         {
             return false;
@@ -408,7 +613,6 @@ public class UnitFieldData
             }
 
             // 縦方向にブロックが無いので、スルー
-            //Debug.Log("x=" + x + ", y="+ y);
             if (y < 0)
             {
                 continue;
@@ -416,7 +620,6 @@ public class UnitFieldData
 
             var actX = x + pos.x;
             var actY = y + pos.y + 1;
-            //Debug.Log("x:" + x + ", actY=" + actY);
             if (actY >= FIELD_HEIGHT || Units[actY, actX].CurrentColor != ColorData.None)
             {
                 return true;
@@ -460,7 +663,6 @@ public class UnitFieldData
     /// </summary>
     public bool CheckExistAutoDropUnit()
     {
-        //Debug.Log("CheckExistAutoDropUnit");
         for (var i = FIELD_HEIGHT - 1; i >= 1; i--)
         {
             for (var j = 0; j < FILED_WIDTH; j++)
@@ -478,19 +680,15 @@ public class UnitFieldData
 
                 // 直上のブロックと現在のブロックの成分が重なったら自動落下するブロックである
                 var multiColor = (unit.GetDisplayColor() & aboveUnit.GetDisplayColor());
-                //var unionColor = (unit.GetDisplayColor() | aboveUnit.GetDisplayColor());
                 var subColor = aboveUnit.GetDisplayColor() & ~multiColor;
 
-                //Debug.LogFormat("pos:{0}, abovePos:{1}, posDispColor:{2}, aboveDispColor:{3}, multiColor:{4}, subColor:{5}",
-                //    new Vector2Int(j, i), new Vector2Int(j, i-1), unit.GetDisplayColor(), aboveUnit.GetDisplayColor(), multiColor, subColor);
                 if (subColor != ColorData.None)
                 {
-                    Debug.LogWarning("Exist AutoDrop");
                     return true;
                 }
             }
         }
-        Debug.LogWarning("Non-Exist AutoDrop");
+
         return false;
     }
 
@@ -503,7 +701,7 @@ public class UnitFieldData
         {
             for (var j = 0; j < FILED_WIDTH; j++)
             {
-                Units[i, j].SetInputData(ColorData.None, false);
+                Units[i, j].SetInputData(ColorData.None, LaserState.None);
             }
         }
     }
@@ -523,15 +721,15 @@ public class UnitFieldData
                 // 対象のブロックが有色で、かつ、下のブロックと同じ成分を持たない時
                 if (unit.CurrentColor != ColorData.None && (unit.CurrentColor & bottomUnit.CurrentColor) == ColorData.None)
                 {
-                    bottomUnit.SetInputData(unit.CurrentColor, unit.IsCurrentLight);
-                    unit.SetCurrentData(ColorData.None, false);
+                    bottomUnit.SetInputData(unit.CurrentColor, unit.CurrentLaserState);
+                    unit.SetCurrentData(ColorData.None, LaserState.None);
                 }
 
                 // 対象のブロックの自動落下が有色で、かつ、下のブロックと同じ成分を持たない時
                 else if (unit.InputColor != ColorData.None && (unit.InputColor & bottomUnit.GetDisplayColor()) == ColorData.None)
                 {
-                    bottomUnit.SetInputData(unit.InputColor, unit.IsInputLight);
-                    unit.SetInputData(ColorData.None, false);
+                    bottomUnit.SetInputData(unit.InputColor, unit.InputLaserState);
+                    unit.SetInputData(ColorData.None, LaserState.None);
                 }
             }
         }
@@ -539,6 +737,8 @@ public class UnitFieldData
 
     /// <summary>
     /// ブロックの色を混ぜ合わせる
+    /// この辺は、レーザーが1つしか存在しないことを前提として簡素化した処理になっています
+    /// 今後、同時に複数のレーザーが存在するような場合は厄介になります
     /// </summary>
     public void MixUnitColor()
     {
@@ -547,8 +747,25 @@ public class UnitFieldData
             for (var j = 0; j < FILED_WIDTH; j++)
             {
                 var unit = Units[i, j];
-                unit.SetCurrentData(unit.CurrentColor | unit.InputColor, unit.IsCurrentLight || unit.IsInputLight);
-                unit.SetInputData(ColorData.None, false);
+
+                // レーザーがある時は混ぜ合わせない
+                if (unit.IsExistLaser())
+                {
+                    Debug.LogFormat("Mix:({0},{1}) ExistLaser", j, i);
+                    continue;
+                }
+
+                if (unit.GetDisplayColor() == ColorData.None)
+                {
+                    unit.SetCurrentData(unit.CurrentColor | unit.InputColor, LaserState.None);
+                    unit.SetInputData(ColorData.None, LaserState.None);
+                }
+                else
+                {
+                    // 空白じゃないブロックにはレーザー照射色も適用する
+                    unit.SetCurrentData(unit.CurrentColor | unit.InputColor | unit.LaserColor, LaserState.None);
+                    unit.SetInputData(ColorData.None, LaserState.None);
+                }
             }
         }
     }
@@ -608,6 +825,159 @@ public class UnitFieldData
                 return true;
             }
         }
+        return false;
+    }
+
+    /// <summary>
+    /// レーザーが存在するかどうかを判定する
+    /// 存在する場合はtrueを返す
+    /// </summary>
+    public bool CheckExistLaserBlock()
+    {
+        for (var i = 0; i < FIELD_HEIGHT; i++)
+        {
+            for (var j = 0; j < FILED_WIDTH; j++)
+            {
+                var unit = Units[i, j];
+                if (unit.GetDisplayColor() != ColorData.None && unit.IsExistLaser())
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 全てのレーザーにステートをセットする
+    /// </summary>
+    public void SetAllLaserState(LaserState laserState)
+    {
+        for (var i = 0; i < FIELD_HEIGHT; i++)
+        {
+            for (var j = 0; j < FILED_WIDTH; j++)
+            {
+                var unit = Units[i, j];
+                if (unit.CurrentLaserState != LaserState.None)
+                {
+                    unit.CurrentLaserState = laserState;
+                }
+                if (unit.InputLaserState != LaserState.None)
+                {
+                    unit.InputLaserState = laserState;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 全てのレーザーのステートを重ね合わせて取得する
+    /// </summary>
+    public LaserState GetAllLaserState()
+    {
+        LaserState state = LaserState.None;
+        for (var i = 0; i < FIELD_HEIGHT; i++)
+        {
+            for (var j = 0; j < FILED_WIDTH; j++)
+            {
+                var unit = Units[i, j];
+                if (unit.CurrentLaserState != LaserState.None)
+                {
+                    state |= unit.CurrentLaserState;
+                }
+                if (unit.InputLaserState != LaserState.None)
+                {
+                    state |= unit.InputLaserState;
+                }
+            }
+        }
+
+        return state;
+    }
+
+    /// <summary>
+    /// レーザーブロックの色を適用する
+    /// </summary>
+    private void ApplyLaserColor()
+    {
+        for (var i = 0; i < FIELD_HEIGHT; i++)
+        {
+            for (var j = 0; j < FILED_WIDTH; j++)
+            {
+                var unit = Units[i, j];
+                if (unit.CurrentLaserState == LaserState.Fire)
+                {
+                    ApplyLaserColor(j, i, unit.CurrentColor);
+                }
+                else if (unit.InputLaserState == LaserState.Fire)
+                {
+                    ApplyLaserColor(j, i, unit.InputColor);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// レーザー照射色をリセットする
+    /// </summary>
+    private void ResetAllLaserColor()
+    {
+        for (var i = 0; i < FIELD_HEIGHT; i++)
+        {
+            for (var j = 0; j < FILED_WIDTH; j++)
+            {
+                var unit = Units[i, j];
+                if (unit.GetDisplayColor() == ColorData.None)
+                {
+                    continue;
+                }
+
+                unit.SetLaserColor(ColorData.None);
+            }
+        }
+    }
+
+    /// <summary>
+    /// レーザーブロックの色を横列に適用する
+    /// </summary>
+    private void ApplyLaserColor(int x, int y, ColorData color)
+    {
+        for (var i = 0; i < FILED_WIDTH; i++)
+        {
+            if (i == x)
+            {
+                continue;
+            }
+
+            Units[y, i].SetLaserColor(color);
+            Debug.LogFormat("x:{0}, y:{1}, c:{2}, disp:{3}", i, y, color, Units[y, i].GetDisplayColor());
+        }
+    }
+
+    /// <summary>
+    /// 現在のミノにレーザーが存在するかどうか
+    /// 存在する場合はtrueを返す
+    /// </summary>
+    public bool IsLaserMino()
+    {
+        if (CurrentMino == null)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < MinoData.MINO_HEIGHT; i++)
+        {
+            for (var j = 0; j < MinoData.MINO_WIDTH; j++)
+            {
+                var unit = CurrentMino.Units[i, j];
+                if (unit.CurrentColor != ColorData.None && unit.IsExistLaser())
+                {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 }

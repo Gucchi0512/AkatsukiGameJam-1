@@ -110,7 +110,6 @@ public class GridColorManager : MonoBehaviour {
                 var nextNextGrid = m_nextNextGrid[height, width];
                 nextGrid.color = GridColorChange(nextMino.Units[height, width].GetDisplayColor());
                 nextNextGrid.color = GridColorChange(nextNextMino.Units[height, width].GetDisplayColor());
-                Debug.Log(nextGrid.color);
             }
         }
     }
