@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GameManagerState
+public enum UnitFieldState
 {
     None,
-
-    /// <summary>
-    /// ゲーム開始時
-    /// </summary>
-    GameStart,
 
     /// <summary>
     /// プレイヤー入力可能時
@@ -32,9 +27,19 @@ public enum GameManagerState
     ChangeColor,
 
     /// <summary>
+    /// レーザー開始時 レーザー演出を入れる可能性があるのでステートとして切り出した
+    /// </summary>
+    StartLaser,
+
+    /// <summary>
+    /// レーザー終了時 レーザー演出を入れる可能背があるのでステートとして切り出した
+    /// </summary>
+    EndLaser,
+
+    /// <summary>
     /// 白ミノ消滅時
     /// </summary>
-    Disapper,
+    Delete,
 
     /// <summary>
     /// ゲームオーバーチェック時
@@ -42,12 +47,12 @@ public enum GameManagerState
     CheckGameOver,
 
     /// <summary>
-    /// ゲーム中
-    /// </summary>
-    Game,
-
-    /// <summary>
     /// ゲームオーバー時
     /// </summary>
-    GameEnd,
+    GameOver,
+
+    /// <summary>
+    /// 時間切れ時
+    /// </summary>
+    TimeUp,
 }

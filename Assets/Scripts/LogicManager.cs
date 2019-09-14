@@ -4,21 +4,15 @@ using UnityEngine;
 
 public class LogicManager
 {
-    /// <summary>
-    /// 一人プレイ用か
-    /// </summary>
-    private bool m_IsSinglePlay;
-
     public UnitFieldData FieldDataPlayer1 { get; private set; }
     public UnitFieldData FieldDataPlayer2 { get; private set; }
 
-    public void OnStart(bool isSinglePlay)
+    public void OnStart()
     {
-        m_IsSinglePlay = isSinglePlay;
         FieldDataPlayer1 = new UnitFieldData(true);
         FieldDataPlayer2 = new UnitFieldData(false);
 
-        if (m_IsSinglePlay)
+        if (GameManager.Instance.IsSinglePlay)
         {
             FieldDataPlayer1.OnStart();
         } else
@@ -30,12 +24,20 @@ public class LogicManager
 
     public void OnStateState()
     {
-        FieldDataPlayer1.OnStartState();
+        if (GameManager.Instance.IsSinglePlay)
+        {
+            FieldDataPlayer1.OnStartState();
+        }
+        else
+        {
+            FieldDataPlayer1.OnStartState();
+            FieldDataPlayer2.OnStartState();
+        }
     }
 
     public void OnUpdate()
     {
-        if (m_IsSinglePlay)
+        if (GameManager.Instance.IsSinglePlay)
         {
             FieldDataPlayer1.OnUpdate();
         } else
@@ -47,6 +49,14 @@ public class LogicManager
 
     public void OnEndState()
     {
-        FieldDataPlayer1.OnEndState();
+        if (GameManager.Instance.IsSinglePlay)
+        {
+            FieldDataPlayer1.OnEndState();
+        }
+        else
+        {
+            FieldDataPlayer1.OnEndState();
+            FieldDataPlayer2.OnEndState();
+        }
     }
 }

@@ -4,11 +4,24 @@ using UnityEngine;
 
 public class UnitData
 {
+    /// <summary>
+    /// 手前側にある色
+    /// </summary>
     public ColorData CurrentColor { get; private set; }
+
+    /// <summary>
+    /// すり抜けているブロックの色
+    /// </summary>
     public ColorData InputColor { get; private set; }
 
-    public bool IsCurrentLight { get; private set; }
-    public bool IsInputLight { get; private set; }
+    /// <summary>
+    /// レーザーで照射されている色
+    /// </summary>
+    public ColorData LaserColor { get; private set; }
+
+    public LaserState CurrentLaserState { get; set; }
+
+    public LaserState InputLaserState { get; set; }
 
     public UnitData()
     {
@@ -23,28 +36,38 @@ public class UnitData
         return CurrentColor == ColorData.None;
     }
 
-    public void SetCurrentData(ColorData color, bool isLight)
+    public void SetCurrentData(ColorData color, LaserState laserState)
     {
         CurrentColor = color;
-        IsCurrentLight = isLight;
+        CurrentLaserState = laserState;
     }
 
-    public void SetInputData(ColorData color, bool isLight)
+    public void SetInputData(ColorData color, LaserState laserState)
     {
         InputColor = color;
-        IsInputLight = isLight;
+        InputLaserState = laserState;
     }
 
     public void InitData()
     {
         CurrentColor = ColorData.None;
         InputColor = ColorData.None;
-        IsCurrentLight = false;
-        IsInputLight = false;
+        CurrentLaserState = LaserState.None;
+        InputLaserState = LaserState.None;
     }
 
     public ColorData GetDisplayColor()
     {
         return CurrentColor | InputColor;
+    }
+
+    public bool IsExistLaser()
+    {
+        return (CurrentLaserState | InputLaserState) != LaserState.None;
+    }
+
+    public void SetLaserColor(ColorData color)
+    {
+        LaserColor = color;
     }
 }
