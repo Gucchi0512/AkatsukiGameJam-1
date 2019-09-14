@@ -4,6 +4,8 @@ using UnityEngine;
 
 public enum GameManagerState
 {
+    None,
+
     /// <summary>
     /// ゲーム開始時
     /// </summary>
