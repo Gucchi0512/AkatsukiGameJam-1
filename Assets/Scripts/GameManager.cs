@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 {
     private LogicManager m_LogicManager;
 
+    public GameManagerState CurrentState { get; private set; }
+
     public GameManager Instance {
         get;
         private set;
