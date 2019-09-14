@@ -272,7 +272,7 @@ public class UnitFieldData
             for (var j = 0; j < MinoData.MINO_WIDTH; j++)
             {
                 var minoUnit = CurrentMino.Units[i, j];
-                if (minoUnit.CurrentColor != ColorData.None)
+                if (minoUnit.CurrentColor == ColorData.None)
                 {
                     continue;
                 }
@@ -375,7 +375,7 @@ public class UnitFieldData
     /// </summary>
     public bool CheckMinoPut()
     {
-        Debug.Log("MinoPos: " + CurrentMino.Pos);
+        //Debug.Log("MinoPos: " + CurrentMino.Pos);
         if (CurrentMino == null)
         {
             return false;
@@ -395,7 +395,7 @@ public class UnitFieldData
             }
 
             // 縦方向にブロックが無いので、スルー
-            Debug.Log("x=" + x + ", y="+ y);
+            //Debug.Log("x=" + x + ", y="+ y);
             if (y < 0)
             {
                 continue;
@@ -403,7 +403,7 @@ public class UnitFieldData
 
             var actX = x + pos.x;
             var actY = y + pos.y + 1;
-            Debug.Log("x:" + x + ", actY=" + actY);
+            //Debug.Log("x:" + x + ", actY=" + actY);
             if (actY >= FIELD_HEIGHT || Units[actY, actX].CurrentColor != ColorData.None)
             {
                 return true;
