@@ -7,13 +7,12 @@ public class UnitData
     public ColorData CurrentColor { get; private set; }
     public ColorData InputColor { get; private set; }
 
-    public bool IsLight { get; private set; }
+    public bool IsCurrentLight { get; private set; }
+    public bool IsInputLight { get; private set; }
 
     public UnitData()
     {
-        CurrentColor = ColorData.None;
-        InputColor = ColorData.None;
-        IsLight = false;
+        InitData();
     }
 
     /// <summary>
@@ -27,6 +26,25 @@ public class UnitData
     public void SetCurrentData(ColorData color, bool isLight)
     {
         CurrentColor = color;
-        IsLight = isLight;
+        IsCurrentLight = isLight;
+    }
+
+    public void SetInputData(ColorData color, bool isLight)
+    {
+        InputColor = color;
+        IsInputLight = isLight;
+    }
+
+    public void InitData()
+    {
+        CurrentColor = ColorData.None;
+        InputColor = ColorData.None;
+        IsCurrentLight = false;
+        IsInputLight = false;
+    }
+
+    public ColorData GetDisplayColor()
+    {
+        return CurrentColor | InputColor;
     }
 }
