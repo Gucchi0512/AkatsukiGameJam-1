@@ -156,7 +156,7 @@ public class GameManager : MonoBehaviour
             case GameManagerState.GameEnd:
                 break;
         }
-        InputManager.OnUpdate();
+        //InputManager.OnUpdate();
         LogicManager.OnEndState();
     }
 }
