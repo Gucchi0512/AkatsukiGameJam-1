@@ -4,44 +4,41 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class GridColorManager : MonoBehaviour
-{
+public class GridColorManager : MonoBehaviour {
 
     public UnitFieldData unitFieldData;
-    public GameObject[] unitLine;
+    public GameObject[] unitLineField;
+    public GameObject[] unitLineNext;
 
-    [SerializeField]private Image[,] m_grids;
+    [SerializeField] private Image[,] m_grids;
+    [SerializeField] private Image[,] m_nextGrid;
     private UnitFieldData m_unitFieldData => unitFieldData;
 
     // Start is called before the first frame update
-    public void OnStart()
-    {
-        m_grids = new Image[UnitFieldData.FIELD_HEIGHT-UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
-        for(int i = 0; i < unitLine.Length; i++) 
-        {
-            foreach(Transform child in unitLine[i].transform) {
+    public void OnStart() {
+        m_grids = new Image[UnitFieldData.FIELD_HEIGHT - UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
+        for (int i = 0; i < unitLineField.Length; i++) {
+            foreach (Transform child in unitLineField[i].transform) {
                 int childIndex = child.GetSiblingIndex();
                 m_grids[i, childIndex] = child.gameObject.GetComponent<Image>();
-                
+
             }
         }
     }
 
     // Update is called once per frame
-    public void OnUpdate()
-    {
+    public void OnUpdate() {
         var gameState = GameManager.Instance.CurrentState;
+        UpdateField();
         switch (gameState) {
             case GameManagerState.None:
             break;
             case GameManagerState.GameStart:
             break;
             case GameManagerState.Input:
-                UpdateField();
-                ShowCurrentMino();
+            ShowCurrentMino();
             break;
             case GameManagerState.Put:
-                UpdateField();
             break;
             case GameManagerState.AutoDrop:
             break;
@@ -50,7 +47,7 @@ public class GridColorManager : MonoBehaviour
             case GameManagerState.GameEnd:
             break;
         }
-        ShowCurrentMino();
+
     }
 
     public void OnStartState() {
@@ -77,11 +74,11 @@ public class GridColorManager : MonoBehaviour
     public void ShowCurrentMino() {
         MinoData currentMino = unitFieldData.CurrentMino;
         int posX = unitFieldData.CurrentMino.Pos.x;
-        int posY = unitFieldData.CurrentMino.Pos.y-UnitFieldData.FIELD_TOP_OFFSET;
-        for (int height = posY;height<posY+MinoData.MINO_HEIGHT;height++) {
-            for(int width = posX; width < posX + MinoData.MINO_WIDTH; width++) {
+        int posY = unitFieldData.CurrentMino.Pos.y - UnitFieldData.FIELD_TOP_OFFSET;
+        for (int height = posY; height < posY + MinoData.MINO_HEIGHT; height++) {
+            for (int width = posX; width < posX + MinoData.MINO_WIDTH; width++) {
                 if (height < 0) continue;
-                var currentColor = currentMino.Units[height-posY, width-posX].GetDisplayColor();
+                var currentColor = currentMino.Units[height - posY, width - posX].GetDisplayColor();
                 if (currentColor == ColorData.None) {
                     continue;
                 } else {
@@ -94,7 +91,7 @@ public class GridColorManager : MonoBehaviour
                         grid.color = Color.green;
                         break;
                         case (ColorData.Red):
-                        grid.color = Color.green;
+                        grid.color = Color.red;
                         break;
                         case (ColorData.Cyan):
                         grid.color = Color.cyan;
