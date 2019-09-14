@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.SceneManagement;
-
-public class GameSystem : MonoBehaviour
-{
-
-    public void StartGame()
-    {
-        SceneManager.LoadScene("MainOP");
-    }
-}
+fileFormatVersion: 2
+guid: b1251c11b4d5eb244ad8e6957d896295
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

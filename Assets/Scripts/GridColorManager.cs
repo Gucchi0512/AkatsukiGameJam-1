@@ -14,7 +14,7 @@ public class GridColorManager : MonoBehaviour
     private UnitFieldData m_unitFieldData => unitFieldData;
 
     // Start is called before the first frame update
-    void Start()
+    public void OnStart()
     {
         m_grids = new Image[16, 8];
         for(int i = 0; i < unitLine.Length; i++) 
@@ -28,7 +28,7 @@ public class GridColorManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void OnUpdate()
     {
         /*for(int i=3;i<UnitFieldData.FIELD_HEIGHT;i++)
         {
