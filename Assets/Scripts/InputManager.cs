@@ -21,66 +21,66 @@ void Update()
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Debug.Log("hard drop");
+                //Debug.Log("hard drop");
                 inputPlayer1 = InputManagerState.HardDrop;
             }
             else if (Input.GetKeyDown(KeyCode.A))
             {
-                Debug.Log("left");
+                //Debug.Log("left");
                 inputPlayer1 = InputManagerState.Left;
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
-                Debug.Log("soft drop");
+                //Debug.Log("soft drop");
                 inputPlayer1 = InputManagerState.SoftDrop;
             }
             else if (Input.GetKeyDown(KeyCode.D))
             {
-                Debug.Log("right");
+                //Debug.Log("right");
                 inputPlayer1 = InputManagerState.Right;
 
             }
             else if (Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log("rotate");
+                //Debug.Log("rotate");
                 inputPlayer1 = InputManagerState.Rotate;
             }
             else
             {
-                Debug.Log("None");
+                //Debug.Log("None");
                 inputPlayer1 = InputManagerState.None;
             }
 
 
             if (Input.GetKeyDown(KeyCode.At))
             {
-                Debug.Log("hard drop");
+                //Debug.Log("hard drop");
                 inputPlayer2 = InputManagerState.HardDrop;
             }
             else if (Input.GetKeyDown(KeyCode.Semicolon))
             {
-                Debug.Log("left");
+                //Debug.Log("left");
                 inputPlayer2 = InputManagerState.Left;
             }
             else if (Input.GetKeyDown(KeyCode.Colon))
             {
-                Debug.Log("soft drop");
+                //Debug.Log("soft drop");
                 inputPlayer2 = InputManagerState.SoftDrop;
             }
             else if (Input.GetKeyDown(KeyCode.RightBracket))
             {
-                Debug.Log("right");
+                //Debug.Log("right");
                 inputPlayer2 = InputManagerState.Right;
 
             }
             else if (Input.GetKeyDown(KeyCode.LeftBracket))
             {
-                Debug.Log("rotate");
+                //Debug.Log("rotate");
                 inputPlayer2 = InputManagerState.Rotate;
             }
             else
             {
-                Debug.Log("None");
+                //Debug.Log("None");
                 inputPlayer1 = InputManagerState.None;
             }
         }
