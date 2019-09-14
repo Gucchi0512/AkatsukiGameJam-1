@@ -69,7 +69,36 @@ public class UnitFieldData
         {
             case GameManagerState.Input:
                 // この中で操作に対する処理を行う
-
+                InputManagerState inputState;
+                if (m_IsPlayer1)
+                {
+                    inputState = GameManager.Instance.InputManager.inputPlayer1;
+                }
+                else
+                {
+                    inputState = GameManager.Instance.InputManager.inputPlayer2;
+                }
+                switch (inputState)
+                {
+                    case InputManagerState.Left:
+                        MoveLeft();
+                        break;
+                    case InputManagerState.Right:
+                        MoveRight();
+                        break;
+                    case InputManagerState.Rotate:
+                        Rotate();
+                        break;
+                    case InputManagerState.SoftDrop:
+                        SoftDrop();
+                        break;
+                    case InputManagerState.HardDrop:
+                        HardDrop();
+                        break;
+                    case InputManagerState.None:
+                        // 何もしない
+                        break;
+                }
 
                 // 自由落下も行う
                 m_AutoDropTimeCount += Time.deltaTime;
@@ -191,6 +220,7 @@ public class UnitFieldData
     /// </summary>
     private void MoveLeft()
     {
+        Debug.Log("Move Left");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x - 1, pos.y))
         {
@@ -204,6 +234,7 @@ public class UnitFieldData
     /// </summary>
     private void MoveRight()
     {
+        Debug.Log("Move Right");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x + 1, pos.y))
         {
@@ -217,6 +248,7 @@ public class UnitFieldData
     /// </summary>
     private void Rotate()
     {
+        Debug.Log("Rotate");
         CurrentMino.Rotate();
     }
 
@@ -225,6 +257,7 @@ public class UnitFieldData
     /// </summary>
     private void SoftDrop()
     {
+        Debug.Log("Soft Drop");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x, pos.y + 1))
         {
@@ -238,6 +271,7 @@ public class UnitFieldData
     /// </summary>
     private void HardDrop()
     {
+        Debug.Log("Hard Drop");
         var pos = CurrentMino.Pos;
         while (CheckMinoProtrude(pos.x, pos.y + 1))
         {

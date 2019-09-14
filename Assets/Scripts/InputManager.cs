@@ -2,21 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+[System.Serializable]
+public class InputManager
 {
-    public GameManager gameManager;
-    public InputManagerState inputPlayer1 {get; private set;}
-    public InputManagerState inputPlayer2 {get; private set;}
+    public InputManagerState inputPlayer1 { get; private set; }
+    public InputManagerState inputPlayer2 { get; private set; }
 
     // Start is called before the first frame update
-    void Start()
+    public void OnStart()
     {
     }
 
-// Update is called once per frame
-void Update()
-{
-    GameManagerState state = gameManager.CurrentState;
+    // Update is called once per frame
+    public void OnUpdate()
+    {
+        GameManagerState state = GameManager.Instance.CurrentState;
+
+        Debug.Log(state);
         if (state == GameManagerState.Input)
         {
             if (Input.GetKeyDown(KeyCode.W))

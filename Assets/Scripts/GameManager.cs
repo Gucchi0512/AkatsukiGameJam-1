@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private LogicManager m_LogicManager;
+    [SerializeField]
+    private GridColorManager m_GridColorManager;
+
+    public GridColorManager GridColorManager { get { return m_GridColorManager; } }
+    public InputManager InputManager { get; private set; }
+    public LogicManager LogicManager { get; private set; }
 
     public GameManagerState CurrentState { get; private set; }
     private GameManagerState m_RequestedState;
@@ -21,7 +26,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
             // DontDestroyはGameManagerのスコープによって処理するかどうか決める
             // 暫定ではスコープは、InGameのみとする
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
             OnAwake();
         }
         else
@@ -40,14 +45,18 @@ public class GameManager : MonoBehaviour
 
     private void OnAwake()
     {
-        m_LogicManager = new LogicManager();
+        InputManager = new InputManager();
+        LogicManager = new LogicManager();
     }
 
     private void Start()
     {
         CurrentState = GameManagerState.None;
-        m_RequestedState = GameManagerState.GameStart;
-        m_LogicManager.OnStart(true);
+        RequestState(GameManagerState.Input);
+
+        InputManager.OnStart();
+        LogicManager.OnStart(true);
+        m_GridColorManager.OnStart();
     }
 
     private void Update()
@@ -91,7 +100,9 @@ public class GameManager : MonoBehaviour
         {
 
         }
-        m_LogicManager.OnUpdate();
+        InputManager.OnUpdate();
+        LogicManager.OnUpdate();
+        m_GridColorManager.OnUpdate();
     }
 
     private void OnEndState()

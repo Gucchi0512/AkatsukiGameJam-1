@@ -17,10 +17,26 @@ public class LogicManager
         m_IsSinglePlay = isSinglePlay;
         FieldDataPlayer1 = new UnitFieldData(true);
         FieldDataPlayer2 = new UnitFieldData(false);
+
+        if (m_IsSinglePlay)
+        {
+            FieldDataPlayer1.OnStart();
+        } else
+        {
+            FieldDataPlayer1.OnStart();
+            FieldDataPlayer2.OnStart();
+        }
     }
 
     public void OnUpdate()
     {
-
+        if (m_IsSinglePlay)
+        {
+            FieldDataPlayer1.OnUpdate();
+        } else
+        {
+            FieldDataPlayer1.OnUpdate();
+            FieldDataPlayer2.OnUpdate();
+        }
     }
 }
