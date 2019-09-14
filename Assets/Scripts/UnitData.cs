@@ -4,7 +4,20 @@ using UnityEngine;
 
 public class UnitData
 {
-    private Vector2Int pos;
-    private ColorData currentColor;
-    private ColorData inputColor;
+    public ColorData CurrentColor { get; private set; }
+    public ColorData InputColor { get; private set; }
+
+    public UnitData()
+    {
+        CurrentColor = ColorData.None;
+        InputColor = ColorData.None;
+    }
+
+    /// <summary>
+    /// 表示するミノとして空かどうか。
+    /// </summary>
+    public bool IsEmptyDisplayData()
+    {
+        return CurrentColor == ColorData.None;
+    }
 }
