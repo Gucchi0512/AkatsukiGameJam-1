@@ -22,7 +22,8 @@ public class UnitFieldData
     /// </summary>
     public const int FIELD_TOP_OFFSET = 3;
 
-    public const float AUTO_DROP_TIME_PERIOD = 0.5f;
+    public const float INPUT_TIME_PERIOD = 0.5f;
+    public const float AUTO_DROP_TIME_PERIOD = 0.1f;
 
 
     public UnitData[,] Units { get; private set; }
@@ -58,6 +59,64 @@ public class UnitFieldData
         NextNextMino = GenerateMinoData(false);
 
         m_AutoDropTimeCount = 0;
+        CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
+    }
+
+    public void OnStartState()
+    {
+        var gameState = GameManager.Instance.CurrentState;
+
+        // 入力ステート受付
+        switch (gameState)
+        {
+            case GameManagerState.Input:
+                m_AutoDropTimeCount = 0;
+                break;
+            case GameManagerState.Put:
+                // 自動落下処理?
+                // 多分ここは、Putになった初回のフレームだけ呼び出すことになる
+                if (CheckExistAutoDropUnit())
+                {
+                    GameManager.Instance.RequestState(GameManagerState.AutoDrop);
+                } else
+                {
+                    GameManager.Instance.RequestState(GameManagerState.ChangeColor);
+                }
+                break;
+            case GameManagerState.AutoDrop:
+                m_AutoDropTimeCount = 0;
+                ResetInputColorData();
+                break;
+            case GameManagerState.ChangeColor:
+                MixUnitColor();
+                // 白色が存在したら白を消してPutに戻る
+                if (CheckExistWhileUnit())
+                {
+                    DeleteWhiteUnit();
+                    GameManager.Instance.RequestState(GameManagerState.Put);
+                } else
+                {
+                    GameManager.Instance.RequestState(GameManagerState.CheckGameOver);
+                }
+                break;
+            case GameManagerState.CheckGameOver:
+                if (CheckPiledUpToTop())
+                {
+                    GameManager.Instance.RequestState(GameManagerState.GameEnd);
+                } else
+                {
+                    // ミノをずらして入力待ちに戻る
+                    CurrentMino = NextMino;
+                    NextMino = NextNextMino;
+                    NextNextMino = GenerateMinoData(false);
+                    CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
+
+                    GameManager.Instance.RequestState(GameManagerState.Input);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public void OnUpdate()
@@ -78,6 +137,7 @@ public class UnitFieldData
                 {
                     inputState = GameManager.Instance.InputManager.inputPlayer2;
                 }
+
                 switch (inputState)
                 {
                     case InputManagerState.Left:
@@ -102,7 +162,7 @@ public class UnitFieldData
 
                 // 自由落下も行う
                 m_AutoDropTimeCount += Time.deltaTime;
-                if (m_AutoDropTimeCount >= AUTO_DROP_TIME_PERIOD)
+                if (m_AutoDropTimeCount >= INPUT_TIME_PERIOD)
                 {
                     m_AutoDropTimeCount = 0;
                     SoftDrop();
@@ -115,15 +175,31 @@ public class UnitFieldData
                     DetermineMinoPos();
 
                     // ゲームマネージャにPutステートをリクエストする
+                    GameManager.Instance.RequestState(GameManagerState.Put);
                 }
                 break;
-            case GameManagerState.Put:
-                // 自動落下処理?
-                // 多分ここは、Putになった初回のフレームだけ呼び出すことになる
+            case GameManagerState.AutoDrop:
+                m_AutoDropTimeCount += Time.deltaTime;
+                if (m_AutoDropTimeCount >= AUTO_DROP_TIME_PERIOD)
+                {
+                    m_AutoDropTimeCount = 0;
+                    UpdateAutoDropUnit();
+
+                    // 自動落下するものが無くなったら遷移する
+                    if (!CheckExistAutoDropUnit())
+                    {
+                        GameManager.Instance.RequestState(GameManagerState.ChangeColor);
+                    }
+                }
                 break;
             default:
                 break;
         }
+    }
+
+    public void OnEndState()
+    {
+
     }
 
     /// <summary>
@@ -132,8 +208,20 @@ public class UnitFieldData
     private MinoData GenerateMinoData(bool isEnableSingleMino)
     {
         var mino = new MinoData();
+        ColorData color = ColorData.None;
+        switch (Random.Range(0, 3))
+        {
+            case 0:
+                color = ColorData.Red;
+                break;
+            case 1:
+                color = ColorData.Green;
+                break;
+            case 2:
+                color = ColorData.Blue;
+                break;
+        }
 
-        var color = (ColorData)(Random.Range(0, 3) + 1);
         MinoData.MinoShape shape;
         if (isEnableSingleMino)
         {
@@ -194,21 +282,34 @@ public class UnitFieldData
         {
             for (var j = 0; j < MinoData.MINO_WIDTH; j++)
             {
-                var actX = j + checkX;
-                var actY = i + checkY;
+                var minoUnit = CurrentMino.Units[i, j];
+                if (minoUnit.CurrentColor == ColorData.None)
+                {
+                    continue;
+                }
 
                 // はみ出していたらアウト
-                var minoUnit = CurrentMino.Units[i, j];
-                if (minoUnit.CurrentColor != ColorData.None && IsOutOfField(actX, actY))
+                var actX = j + checkX;
+                var actY = i + checkY;
+                if (IsOutOfField(actX, actY))
                 {
                     return false;
                 }
 
-                // フィールド上にあるブロックと同じ色成分があればアウト
-                var fieldUnit = Units[actY, actX];
-                if ((minoUnit.CurrentColor & fieldUnit.CurrentColor) != ColorData.None)
+                try
                 {
-                    return false;
+                    // フィールド上のブロックが存在すればアウト
+                    var fieldUnit = Units[actY, actX];
+                    Debug.LogFormat("CheckMinoProtrude: minoPos:{0} fieldPos:{1}, minoColor:{2}, fieldColor:{3}",
+                        new Vector2Int(j, i), new Vector2Int(actX, actY), minoUnit.CurrentColor, fieldUnit.CurrentColor);
+                    if (fieldUnit.CurrentColor != ColorData.None)
+                    {
+                        return false;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    Debug.LogErrorFormat("x:{0}, y:{1}", actX, actY);
                 }
             }
         }
@@ -257,7 +358,7 @@ public class UnitFieldData
     /// </summary>
     private void SoftDrop()
     {
-        Debug.Log("Soft Drop");
+        //Debug.Log("Soft Drop");
         var pos = CurrentMino.Pos;
         if (CheckMinoProtrude(pos.x, pos.y + 1))
         {
@@ -287,6 +388,7 @@ public class UnitFieldData
     /// </summary>
     public bool CheckMinoPut()
     {
+        //Debug.Log("MinoPos: " + CurrentMino.Pos);
         if (CurrentMino == null)
         {
             return false;
@@ -306,13 +408,15 @@ public class UnitFieldData
             }
 
             // 縦方向にブロックが無いので、スルー
+            //Debug.Log("x=" + x + ", y="+ y);
             if (y < 0)
             {
                 continue;
             }
 
             var actX = x + pos.x;
-            var actY = y + pos.y;
+            var actY = y + pos.y + 1;
+            //Debug.Log("x:" + x + ", actY=" + actY);
             if (actY >= FIELD_HEIGHT || Units[actY, actX].CurrentColor != ColorData.None)
             {
                 return true;
@@ -356,6 +460,7 @@ public class UnitFieldData
     /// </summary>
     public bool CheckExistAutoDropUnit()
     {
+        //Debug.Log("CheckExistAutoDropUnit");
         for (var i = FIELD_HEIGHT - 1; i >= 1; i--)
         {
             for (var j = 0; j < FILED_WIDTH; j++)
@@ -366,18 +471,26 @@ public class UnitFieldData
                 var aboveColor = aboveUnit.CurrentColor;
 
                 // 直上に何も無ければスルー
-                if (aboveColor == ColorData.None)
+                if (aboveUnit.GetDisplayColor() == ColorData.None)
                 {
                     continue;
                 }
 
                 // 直上のブロックと現在のブロックの成分が重なったら自動落下するブロックである
-                if ((aboveColor & (unitColor | unit.InputColor)) == ColorData.None)
+                var multiColor = (unit.GetDisplayColor() & aboveUnit.GetDisplayColor());
+                //var unionColor = (unit.GetDisplayColor() | aboveUnit.GetDisplayColor());
+                var subColor = aboveUnit.GetDisplayColor() & ~multiColor;
+
+                //Debug.LogFormat("pos:{0}, abovePos:{1}, posDispColor:{2}, aboveDispColor:{3}, multiColor:{4}, subColor:{5}",
+                //    new Vector2Int(j, i), new Vector2Int(j, i-1), unit.GetDisplayColor(), aboveUnit.GetDisplayColor(), multiColor, subColor);
+                if (subColor != ColorData.None)
                 {
+                    Debug.LogWarning("Exist AutoDrop");
                     return true;
                 }
             }
         }
+        Debug.LogWarning("Non-Exist AutoDrop");
         return false;
     }
 
@@ -415,7 +528,7 @@ public class UnitFieldData
                 }
 
                 // 対象のブロックの自動落下が有色で、かつ、下のブロックと同じ成分を持たない時
-                else if (unit.InputColor != ColorData.None && (unit.InputColor & bottomUnit.CurrentColor) == ColorData.None)
+                else if (unit.InputColor != ColorData.None && (unit.InputColor & bottomUnit.GetDisplayColor()) == ColorData.None)
                 {
                     bottomUnit.SetInputData(unit.InputColor, unit.IsInputLight);
                     unit.SetInputData(ColorData.None, false);

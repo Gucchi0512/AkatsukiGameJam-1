@@ -28,6 +28,11 @@ public class LogicManager
         }
     }
 
+    public void OnStateState()
+    {
+        FieldDataPlayer1.OnStartState();
+    }
+
     public void OnUpdate()
     {
         if (m_IsSinglePlay)
@@ -38,5 +43,10 @@ public class LogicManager
             FieldDataPlayer1.OnUpdate();
             FieldDataPlayer2.OnUpdate();
         }
+    }
+
+    public void OnEndState()
+    {
+        FieldDataPlayer1.OnEndState();
     }
 }

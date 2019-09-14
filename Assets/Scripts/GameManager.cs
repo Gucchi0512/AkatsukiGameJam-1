@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         CurrentState = GameManagerState.None;
-        RequestState(GameManagerState.Input);
+        RequestState(GameManagerState.GameStart);
 
         InputManager.OnStart();
         LogicManager.OnStart(true);
@@ -90,15 +90,47 @@ public class GameManager : MonoBehaviour
     {
         switch (CurrentState)
         {
-
+            case GameManagerState.None:
+                break;
+            case GameManagerState.GameStart:
+                break;
+            case GameManagerState.Input:
+                break;
+            case GameManagerState.Put:
+                break;
+            case GameManagerState.AutoDrop:
+                break;
+            case GameManagerState.CheckGameOver:
+                break;
+            case GameManagerState.GameEnd:
+                break;
         }
+        LogicManager.OnStateState();
+        GridColorManager.OnStartState();
     }
 
     private void OnUpdateState()
     {
         switch (CurrentState)
         {
-
+            case GameManagerState.None:
+                break;
+            case GameManagerState.GameStart:
+                Debug.Log("Game Start!");
+                RequestState(GameManagerState.Input);
+                break;
+            case GameManagerState.Input:
+                break;
+            case GameManagerState.Put:
+                break;
+            case GameManagerState.AutoDrop:
+                break;
+            case GameManagerState.CheckGameOver:
+                break;
+            case GameManagerState.GameEnd:
+                Debug.Log("Game End!");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
+                break;
         }
         InputManager.OnUpdate();
         LogicManager.OnUpdate();
@@ -109,7 +141,22 @@ public class GameManager : MonoBehaviour
     {
         switch (CurrentState)
         {
-
+            case GameManagerState.None:
+                break;
+            case GameManagerState.GameStart:
+                break;
+            case GameManagerState.Input:
+                break;
+            case GameManagerState.Put:
+                break;
+            case GameManagerState.AutoDrop:
+                break;
+            case GameManagerState.CheckGameOver:
+                break;
+            case GameManagerState.GameEnd:
+                break;
         }
+        //InputManager.OnUpdate();
+        LogicManager.OnEndState();
     }
 }

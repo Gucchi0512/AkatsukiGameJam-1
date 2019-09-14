@@ -24,7 +24,7 @@ public enum GameManagerState
     /// <summary>
     /// 自動的に落下する時
     /// </summary>
-    DropDown,
+    AutoDrop,
 
     /// <summary>
     /// 色替え時
