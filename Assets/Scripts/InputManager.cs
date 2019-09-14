@@ -52,7 +52,6 @@ public class InputManager
                 inputPlayer1 = InputManagerState.None;
             }
 
-
             if (Input.GetKeyDown(KeyCode.At))
             {
                 //Debug.Log("hard drop");
@@ -82,7 +81,7 @@ public class InputManager
             else
             {
                 //Debug.Log("None");
-                inputPlayer1 = InputManagerState.None;
+                inputPlayer2 = InputManagerState.None;
             }
         }
     }
