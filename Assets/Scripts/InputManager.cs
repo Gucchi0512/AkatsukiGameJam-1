@@ -18,7 +18,6 @@ public class InputManager
     {
         GameManagerState state = GameManager.Instance.CurrentState;
 
-        Debug.Log(state);
         if (state == GameManagerState.Input)
         {
             if (Input.GetKeyDown(KeyCode.W))
