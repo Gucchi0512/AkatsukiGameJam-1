@@ -16,7 +16,7 @@ public class GridColorManager : MonoBehaviour
     // Start is called before the first frame update
     public void OnStart()
     {
-        m_grids = new Image[16, 8];
+        m_grids = new Image[UnitFieldData.FIELD_HEIGHT-UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
         for(int i = 0; i < unitLine.Length; i++) 
         {
             foreach(Transform child in unitLine[i].transform) {
@@ -30,39 +30,62 @@ public class GridColorManager : MonoBehaviour
     // Update is called once per frame
     public void OnUpdate()
     {
-        for(int i=3;i<UnitFieldData.FIELD_HEIGHT;i++)
+        for(int height=3;height<UnitFieldData.FIELD_HEIGHT;height++)
         {
-            for(int j=0;j<UnitFieldData.FILED_WIDTH;j++)
+            for(int width=0;width<UnitFieldData.FILED_WIDTH;width++)
             {
-                switch (m_unitFieldData.Units[i, j].GetDisplayColor())
+                var grid = m_grids[height - UnitFieldData.FIELD_TOP_OFFSET, width];
+                switch (m_unitFieldData.Units[height, width].GetDisplayColor())
                 {
+
                     case (ColorData.Blue):
-                        m_grids[i, j].color = Color.blue;
+                        grid.color = Color.blue;
                         break;
                     case (ColorData.Green):
-                        m_grids[i, j].color = Color.green;
+                        grid.color = Color.green;
                         break;
                     case (ColorData.Red):
-                        m_grids[i, j].color = Color.green;
+                        grid.color = Color.green;
                         break;
                     case (ColorData.Cyan):
-                        m_grids[i, j].color = Color.cyan;
+                        grid.color = Color.cyan;
                         break;
                     case (ColorData.Magenta):
-                        m_grids[i, j].color = Color.magenta;
+                        grid.color = Color.magenta;
                         break;
                     case (ColorData.Yellow):
-                        m_grids[i, j].color = Color.yellow;
+                        grid.color = Color.yellow;
                         break;
                     case (ColorData.White):
-                        m_grids[i, j].color = Color.white;
+                        grid.color = Color.white;
                         break;
                     case (ColorData.None):
-                        m_grids[i, j].color = new Color(0, 0, 0, 0);
+                        grid.color = new Color(0, 0, 0, 0);
                         break;
                 }
             }
         }
         
+    }
+
+    public void OnStartState() {
+        var gameState = GameManager.Instance.CurrentState;
+        switch (gameState) {
+            case GameManagerState.None:
+            break;
+            case GameManagerState.GameStart:
+            unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer1;
+            break;
+            case GameManagerState.Input:
+            break;
+            case GameManagerState.Put:
+            break;
+            case GameManagerState.AutoDrop:
+            break;
+            case GameManagerState.CheckGameOver:
+            break;
+            case GameManagerState.GameEnd:
+            break;
+        }
     }
 }

@@ -106,6 +106,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
         LogicManager.OnStateState();
+        GridColorManager.OnStartState();
     }
 
     private void OnUpdateState()
@@ -157,6 +158,5 @@ public class GameManager : MonoBehaviour
         }
         InputManager.OnUpdate();
         LogicManager.OnEndState();
-        m_GridColorManager.OnUpdate();
     }
 }
