@@ -18,31 +18,30 @@ public class InputManager
     {
         GameManagerState state = GameManager.Instance.CurrentState;
 
-        Debug.Log(state);
         if (state == GameManagerState.Input)
         {
-            if (Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Joystick2Button2))
             {
                 //Debug.Log("hard drop");
                 inputPlayer1 = InputManagerState.HardDrop;
             }
-            else if (Input.GetKeyDown(KeyCode.A))
+            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.Joystick2Button0))
             {
                 //Debug.Log("left");
                 inputPlayer1 = InputManagerState.Left;
             }
-            else if (Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.Joystick2Button1))
             {
                 //Debug.Log("soft drop");
                 inputPlayer1 = InputManagerState.SoftDrop;
             }
-            else if (Input.GetKeyDown(KeyCode.D))
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick2Button3))
             {
                 //Debug.Log("right");
                 inputPlayer1 = InputManagerState.Right;
 
             }
-            else if (Input.GetKeyDown(KeyCode.E))
+            else if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Joystick2Button15))
             {
                 //Debug.Log("rotate");
                 inputPlayer1 = InputManagerState.Rotate;
@@ -53,29 +52,28 @@ public class InputManager
                 inputPlayer1 = InputManagerState.None;
             }
 
-
-            if (Input.GetKeyDown(KeyCode.At))
+            if (Input.GetKeyDown(KeyCode.At)|| Input.GetKeyDown(KeyCode.Joystick1Button1))
             {
                 //Debug.Log("hard drop");
                 inputPlayer2 = InputManagerState.HardDrop;
             }
-            else if (Input.GetKeyDown(KeyCode.Semicolon))
+            else if (Input.GetKeyDown(KeyCode.Semicolon) || Input.GetKeyDown(KeyCode.Joystick1Button3))
             {
                 //Debug.Log("left");
                 inputPlayer2 = InputManagerState.Left;
             }
-            else if (Input.GetKeyDown(KeyCode.Colon))
+            else if (Input.GetKeyDown(KeyCode.Colon) || Input.GetKeyDown(KeyCode.Joystick1Button2))
             {
                 //Debug.Log("soft drop");
                 inputPlayer2 = InputManagerState.SoftDrop;
             }
-            else if (Input.GetKeyDown(KeyCode.RightBracket))
+            else if (Input.GetKeyDown(KeyCode.RightBracket) || Input.GetKeyDown(KeyCode.Joystick1Button0))
             {
                 //Debug.Log("right");
                 inputPlayer2 = InputManagerState.Right;
 
             }
-            else if (Input.GetKeyDown(KeyCode.LeftBracket))
+            else if (Input.GetKeyDown(KeyCode.LeftBracket) || Input.GetKeyDown(KeyCode.Joystick1Button15))
             {
                 //Debug.Log("rotate");
                 inputPlayer2 = InputManagerState.Rotate;
@@ -83,7 +81,7 @@ public class InputManager
             else
             {
                 //Debug.Log("None");
-                inputPlayer1 = InputManagerState.None;
+                inputPlayer2 = InputManagerState.None;
             }
         }
     }
