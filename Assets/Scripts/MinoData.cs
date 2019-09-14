@@ -27,7 +27,7 @@ public class MinoData
 
     public MinoData()
     {
-        Pos = new Vector2Int(-1, -1);
+        Pos = new Vector2Int(0, 0);
         Units = new UnitData[MINO_HEIGHT, MINO_WIDTH];
         for (var i = 0; i < MINO_HEIGHT; i++)
         {
