@@ -18,7 +18,7 @@ public class ButtonManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.At))
+        if (Input.GetKeyDown(KeyCode.At) || Input.GetKeyDown(KeyCode.Joystick1Button9))
         {
             startButton.SetActive(false);
             button1P.SetActive(true);
