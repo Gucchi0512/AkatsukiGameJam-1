@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 
     public GameManagerState CurrentState { get; private set; }
 
-    public GameManager Instance {
+    public static GameManager Instance {
         get;
         private set;
     }

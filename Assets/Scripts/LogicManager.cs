@@ -15,8 +15,8 @@ public class LogicManager
     public void OnStart(bool isSinglePlay)
     {
         m_IsSinglePlay = isSinglePlay;
-        FieldDataPlayer1 = new UnitFieldData();
-        FieldDataPlayer2 = new UnitFieldData();
+        FieldDataPlayer1 = new UnitFieldData(true);
+        FieldDataPlayer2 = new UnitFieldData(false);
     }
 
     public void OnUpdate()
