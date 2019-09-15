@@ -17,7 +17,7 @@ public class GridColorManager : MonoBehaviour {
     public Image laser;
 
 
-    [SerializeField] private Image[,] m_grids;
+    [SerializeField] private GridController[,] m_grids;
     [SerializeField] private Image[,] m_nextGrid;
     [SerializeField] private Image[,] m_nextNextGrid;
     private UnitFieldData m_unitFieldData => unitFieldData;
@@ -26,15 +26,15 @@ public class GridColorManager : MonoBehaviour {
     // Start is called before the first frame update
     public void OnStart() {
         m_gridBG = GameObject.FindGameObjectWithTag("GridBG");
-        m_grids = new Image[UnitFieldData.FIELD_HEIGHT - UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
+        m_grids = new GridController[UnitFieldData.FIELD_HEIGHT - UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
         m_nextGrid = new Image[MinoData.MINO_HEIGHT, MinoData.MINO_WIDTH];
         m_nextNextGrid = new Image[MinoData.MINO_HEIGHT, MinoData.MINO_WIDTH];
 
         for (int i = 0; i < unitLineField.Length; i++) {
             foreach (Transform child in unitLineField[i].transform) {
                 int childIndex = child.GetSiblingIndex();
-                m_grids[i, childIndex] = child.gameObject.GetComponent<Image>();
-                m_grids[i, childIndex].sprite = minoTexture;
+                m_grids[i, childIndex] = child.gameObject.GetComponent<GridController>();
+                m_grids[i, childIndex].Grid.sprite = minoTexture;
 
             }
         }
@@ -107,7 +107,7 @@ public class GridColorManager : MonoBehaviour {
                     continue;
                 } else {
                     var grid = m_grids[height, width];
-                    grid.color = GridColorChange(currentColor);
+                    grid.Grid.color = GridColorChange(currentColor);
                 }
             }
         }
@@ -117,11 +117,46 @@ public class GridColorManager : MonoBehaviour {
         for (int height = 3; height < UnitFieldData.FIELD_HEIGHT; height++) {
             for (int width = 0; width < UnitFieldData.FILED_WIDTH; width++) {
                 var grid = m_grids[height - UnitFieldData.FIELD_TOP_OFFSET, width];
-                grid.color = GridColorChange(m_unitFieldData.Units[height, width].GetDisplayColor());
+                grid.Grid.color = GridColorChange(m_unitFieldData.Units[height, width].GetDisplayColor());
 
             }
         }
+
+        UpdateFieldMarker();
+        //var state = m_unitFieldData.CurrentState;
+        //if (state == UnitFieldState.Input)
+        //{
+        //    UpdateFieldMarker();
+        //}
     }
+
+    private void UpdateFieldMarker()
+    {
+        for (int height = 3; height < UnitFieldData.FIELD_HEIGHT; height++)
+        {
+            for (int width = 0; width < UnitFieldData.FILED_WIDTH; width++)
+            {
+                var grid = m_grids[height - UnitFieldData.FIELD_TOP_OFFSET, width];
+                grid.GridMarker.gameObject.SetActive(false);
+            }
+        }
+
+        var list = m_unitFieldData.GetPredictionDropPosList();
+        if (list == null)
+        {
+            return;
+        }
+        foreach (var pos in list)
+        {
+            if (m_unitFieldData.IsOutOfField(pos.x, pos.y))
+            {
+                continue;
+            }
+            var grid = m_grids[pos.y - UnitFieldData.FIELD_TOP_OFFSET, pos.x];
+            grid.GridMarker.gameObject.SetActive(true);
+        }
+    }
+
     public void ShowNextMino() {
         MinoData nextMino = m_unitFieldData.NextMino;
         MinoData nextNextMino = m_unitFieldData.NextNextMino;

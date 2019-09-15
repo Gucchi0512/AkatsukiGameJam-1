@@ -275,12 +275,10 @@ public class UnitFieldData
             }
             else if ((laserState & LaserState.Fire) == LaserState.Fire)
             {
-                Debug.Log("ApplyLaser");
                 ApplyLaserColor();
             }
         }
 
-        Debug.Log("Mix");
         MixUnitColor();
         if (CheckExistWhileUnit())
         {
@@ -305,7 +303,6 @@ public class UnitFieldData
 
     private void OnStartStateAtGameStartLaser()
     {
-        Debug.LogWarning("StartLaser");
         SetAllLaserState(LaserState.Fire);
         RequestState(UnitFieldState.ChangeColor);
     }
@@ -313,7 +310,6 @@ public class UnitFieldData
     private void OnStartStateAtGameEndLaser()
     {
         // Noneにすることでレーザーを通常ブロックとして扱うようにする
-        Debug.LogWarning("EndLaser");
         SetAllLaserState(LaserState.None);
         ResetAllLaserColor();
         RequestState(UnitFieldState.ChangeColor);
@@ -441,7 +437,7 @@ public class UnitFieldData
     /// 指定した座標がフィールドからはみ出しているかどうか。
     /// はみ出していたらtrueを返す。
     /// </summary>
-    private bool IsOutOfField(int x, int y)
+    public bool IsOutOfField(int x, int y)
     {
         return x < 0 || x >= FILED_WIDTH || y < 0 || y >= FIELD_HEIGHT;
     }
@@ -650,40 +646,22 @@ public class UnitFieldData
                 {
                     if ((unitColor & aboveColor) == ColorData.None)
                     {
-                        Debug.LogWarning("Exist Auto Drop");
                         return true;
                     }
                 }
                 else
                 {
-                    Debug.LogFormat("pos:{0}, abovePos:{1}, unitColor:{2}, unitInColor:{4}, aboveColor:{3}, aboveInColor:{5}",
-                        new Vector2Int(j, i), new Vector2Int(j, i - 1), unitColor, aboveColor, unit.InputColor, aboveUnit.InputColor);
                     if ((unitColor & aboveUnit.InputColor) == ColorData.None)
                     {
                         if ((unit.InputColor & aboveUnit.InputColor) == ColorData.None)
                         {
-                            Debug.LogWarning("Exist Auto Drop");
                             return true;
                         }
                     }
                 }
-
-                //// 直上のブロックと現在のブロックの成分が重なったら自動落下するブロックである
-                //var multiColor = (unit.GetOverrappedColor() & aboveUnit.GetOverrappedColor());
-                //var subColor = aboveUnit.GetOverrappedColor() & ~multiColor;
-
-                //Debug.LogFormat("pos:{0}, abovePos:{1}, unitColor:{2}, unitInColor:{6}, aboveColor:{3}, aboveInColor:{7}, multiColor:{4}, subColor:{5}",
-                //    new Vector2Int(j, i), new Vector2Int(j, i-1), unitColor, aboveColor, multiColor, subColor, unit.InputColor, aboveUnit.InputColor);
-
-                //if (subColor != ColorData.None)
-                //{
-                //    Debug.LogWarning("Exist Auto Drop");
-                //    return true;
-                //}
             }
         }
 
-        Debug.LogWarning("Non-Exist Auto Drop");
         return false;
     }
 
@@ -746,7 +724,6 @@ public class UnitFieldData
                 // レーザーがある時は混ぜ合わせない
                 if (unit.IsExistLaser())
                 {
-                    Debug.LogErrorFormat("Mix:({0},{1}) ExistLaser", j, i);
                     continue;
                 }
 
@@ -845,7 +822,7 @@ public class UnitFieldData
             for (var j = 0; j < FILED_WIDTH; j++)
             {
                 var unit = Units[i, j];
-                if (unit.GetDisplayColor() != ColorData.None && unit.IsExistLaser())
+                if (unit.GetOverrappedColor() != ColorData.None && unit.IsExistLaser())
                 {
                     return true;
                 }
@@ -885,6 +862,7 @@ public class UnitFieldData
     /// </summary>
     public void SetAllLaserState(LaserState laserState)
     {
+        Debug.LogError(111);
         for (var i = 0; i < FIELD_HEIGHT; i++)
         {
             for (var j = 0; j < FILED_WIDTH; j++)
@@ -982,25 +960,6 @@ public class UnitFieldData
             }
 
             Units[y, i].SetLaserColor(color);
-            Debug.LogFormat("x:{0}, y:{1}, c:{2}, disp:{3}", i, y, color, Units[y, i].GetDisplayColor());
-        }
-    }
-
-    /// <summary>
-    /// レーザーブロックから通常ブロックへ戻す
-    /// </summary>
-    private void ChangeNormalFromLaesr()
-    {
-        for (var i = 0; i < FIELD_HEIGHT; i++)
-        {
-            for (var j = 0; j < FILED_WIDTH; j++)
-            {
-                var unit = Units[i, j];
-                if (unit.GetDisplayColor() != ColorData.None && unit.IsExistLaser())
-                {
-
-                }
-            }
         }
     }
 
@@ -1047,10 +1006,11 @@ public class UnitFieldData
                 }
 
                 int predictPos = FIELD_HEIGHT - 1;
-                int y = i + 1;
+                int x = CurrentMino.Pos.x + j;
+                int y = CurrentMino.Pos.y + i + 1;
                 for (; y < FIELD_HEIGHT; y++)
                 {
-                    var unit = Units[y, j];
+                    var unit = Units[y, x];
                     if ((minoUnit.CurrentColor & unit.CurrentColor) != ColorData.None)
                     {
                         predictPos = y - 1;
@@ -1058,7 +1018,7 @@ public class UnitFieldData
                     }
                 }
 
-                list.Add(new Vector2Int(j, y));
+                list.Add(new Vector2Int(x, predictPos));
             }
         }
         return list;
