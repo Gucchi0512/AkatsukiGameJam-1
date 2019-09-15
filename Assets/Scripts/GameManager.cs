@@ -13,7 +13,9 @@ public class GameManager : MonoBehaviour
     public const int SCORE_COMBO_POINT = 50;
 
     [SerializeField]
-    private GridColorManager m_GridColorManager;
+    private GridColorManager m_GridColorManagerP1;
+    [SerializeField]
+    private GridColorManager m_GridColorManagerP2;
 
     [SerializeField]
     private bool m_IsSinglePlayMode;
@@ -22,7 +24,9 @@ public class GameManager : MonoBehaviour
     private MinoGenerateRoundData m_MinoGenerateRoundData;
     public MinoGenerateRoundData MinoGenerateRoundData => m_MinoGenerateRoundData;
 
-    public GridColorManager GridColorManager => m_GridColorManager;
+    public GridColorManager GridColorManagerP1 => m_GridColorManagerP1;
+    public GridColorManager GridColorManagerP2 => m_GridColorManagerP2;
+
     public InputManager InputManager { get; private set; }
     public LogicManager LogicManager { get; private set; }
 
@@ -86,7 +90,8 @@ public class GameManager : MonoBehaviour
 
         InputManager.OnStart();
         LogicManager.OnStart();
-        m_GridColorManager.OnStart();
+        m_GridColorManagerP1.OnStart();
+        if (!IsSinglePlay) m_GridColorManagerP2.OnStart();
     }
 
     private void Update()
@@ -138,7 +143,9 @@ public class GameManager : MonoBehaviour
                 break;
         }
         LogicManager.OnStateState();
-        GridColorManager.OnStartState();
+        GridColorManagerP1.OnStartState();
+        if (!IsSinglePlay) GridColorManagerP2.OnStartState();
+
     }
 
     private void OnUpdateState()
@@ -192,7 +199,8 @@ public class GameManager : MonoBehaviour
             m_GameStartCountDown--;
             m_GameStartCountDownTime = 1;
         }
-        m_GridColorManager.OnUpdate();
+        m_GridColorManagerP1.OnUpdate();
+        if(!IsSinglePlay) m_GridColorManagerP2.OnUpdate();
     }
 
     private void OnUpdateGame()
@@ -205,7 +213,8 @@ public class GameManager : MonoBehaviour
 
         InputManager.OnUpdate();
         LogicManager.OnUpdate();
-        m_GridColorManager.OnUpdate();
+        m_GridColorManagerP1.OnUpdate();
+        if (!IsSinglePlay) m_GridColorManagerP2.OnUpdate();
 
         var playerState = LogicManager.FieldDataPlayer1.CurrentState;
         if (playerState == UnitFieldState.GameOver || playerState == UnitFieldState.TimeUp)
