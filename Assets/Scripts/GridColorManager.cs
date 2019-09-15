@@ -53,7 +53,6 @@ public class GridColorManager : MonoBehaviour {
         UpdateField();
         ShowCurrentMino();
         ShowNextMino();
-        //effectManager.OnDeleteWhiteUnit(m_grids[0, 0].gameObject);
     }
 
     public void OnStartState() {
@@ -62,7 +61,11 @@ public class GridColorManager : MonoBehaviour {
             case GameManagerState.None:
             break;
             case GameManagerState.GameStart:
-            unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer1;
+            if (this.gameObject.tag == "Player1") {
+                unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer1;
+            } else {
+                unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer2;
+            }
             unitFieldData.AddStartStateAction(EffectPlay);
             break;
             case GameManagerState.Input:
@@ -166,11 +169,10 @@ public class GridColorManager : MonoBehaviour {
         if (unitFieldData.CurrentState == UnitFieldState.Delete) {
             if (unitFieldData.ComboDataList != null) {
                 List<ComboData> dataList = unitFieldData.ComboDataList;
-                foreach(var item in dataList) {
+                foreach (var item in dataList) {
                     int posX = item.Pos.x;
-                    int posY = item.Pos.y-UnitFieldData.FIELD_TOP_OFFSET;
-                    string combotext = item.ComboCount.ToString() + "Combo!!";
-                    effectManager.OnDeleteWhiteUnit(m_grids[posY, posX].gameObject, combotext);
+                    int posY = item.Pos.y - UnitFieldData.FIELD_TOP_OFFSET;
+                    effectManager.OnDeleteWhiteUnit(m_grids[posY, posX].gameObject, item.ComboCount);
                 }
             }
         }
