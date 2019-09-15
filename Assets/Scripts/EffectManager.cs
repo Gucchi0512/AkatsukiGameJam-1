@@ -12,17 +12,20 @@ public class EffectManager : MonoBehaviour
     public GameObject comboText;
     [SerializeField] private Vector3 textOffset = new Vector3(); 
 
-    public void OnDeleteWhiteUnit(GameObject grid, string text) {
+    public void OnDeleteWhiteUnit(GameObject grid, int combo) {
+        string text = combo.ToString() + "Combo!!";
         Text combotxt = comboText.GetComponent<Text>();
         combotxt.text = text;
         GameObject eff = (GameObject)Instantiate(renderTex, grid.transform.position, Quaternion.identity);
-        GameObject comboTextObj = (GameObject)Instantiate(comboText, grid.transform.position + textOffset, Quaternion.identity);
         eff.transform.SetParent(grid.transform);
-        comboTextObj.transform.SetParent(grid.transform);
         deleteEff.GetComponent<ParticleSystem>().Emit(3);
-        comboText.GetComponent<Animation>().Play();
         Destroy(eff, 2);
-        Destroy(comboTextObj, 2);
+        if (combo > 0) {
+            GameObject comboTextObj = (GameObject)Instantiate(comboText, grid.transform.position + textOffset, Quaternion.identity);
+            comboTextObj.transform.SetParent(grid.transform);
+            comboText.GetComponent<Animation>().Play();
+            Destroy(comboTextObj, 2);
+        }
     }
 
 }
