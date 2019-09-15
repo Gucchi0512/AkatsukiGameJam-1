@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 /// <summary>
 /// フィールドとプレイヤーが動かすミノのデータなどを管理する。
@@ -33,6 +34,8 @@ public class UnitFieldData
 
     public int Score { get; private set; }
 
+    public List<ComboData> ComboDataList { get; private set; }
+
     public UnitFieldState CurrentState { get; private set; }
     private UnitFieldState m_RequestedState;
 
@@ -42,6 +45,12 @@ public class UnitFieldData
     private bool m_IsPlayer1;
 
     private float m_AutoDropTimeCount;
+
+    private Action m_StartStateAction;
+    public void AddStartStateAction(Action action)
+    {
+        m_StartStateAction += action;
+    }
 
     public UnitFieldData(bool isPlayer1)
     {
@@ -64,6 +73,7 @@ public class UnitFieldData
         NextNextMino = GenerateMinoData(false);
 
         m_AutoDropTimeCount = 0;
+        ComboDataList = null;
         CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
     }
 
@@ -175,6 +185,8 @@ public class UnitFieldData
                 OnStartStateAtGameTimeUp();
                 break;
         }
+
+        m_StartStateAction?.Invoke();
     }
 
     private void OnUpdateStateAtGame()
@@ -224,6 +236,8 @@ public class UnitFieldData
 
     private void OnStartStateAtGamePut()
     {
+        ComboDataList = null;
+
         if (CheckExistAutoDropUnit())
         {
             RequestState(UnitFieldState.AutoDrop);
@@ -299,7 +313,7 @@ public class UnitFieldData
 
     private void OnStartStateAtGameDelete()
     {
-        DeleteWhiteUnit();
+        ComboDataList = DeleteWhiteUnit();
         RequestState(UnitFieldState.Put);
     }
 
@@ -422,7 +436,7 @@ public class UnitFieldData
     {
         var mino = new MinoData();
         ColorData color = ColorData.None;
-        switch (Random.Range(0, 3))
+        switch (UnityEngine.Random.Range(0, 3))
         {
             case 0:
                 color = ColorData.Red;
@@ -438,11 +452,11 @@ public class UnitFieldData
         MinoData.MinoShape shape;
         if (isEnableSingleMino)
         {
-            shape = (MinoData.MinoShape)Random.Range(0, 3);
+            shape = (MinoData.MinoShape)UnityEngine.Random.Range(0, 3);
         }
         else
         {
-            shape = (MinoData.MinoShape)Random.Range(0, 2);
+            shape = (MinoData.MinoShape)UnityEngine.Random.Range(0, 2);
         }
         switch (shape)
         {
@@ -794,9 +808,9 @@ public class UnitFieldData
     /// 白ブロックを削除する
     /// </summary>
     /// <returns>削除された白ブロックの座標リスト</returns>
-    public List<Vector2Int> DeleteWhiteUnit()
+    public List<ComboData> DeleteWhiteUnit()
     {
-        List<Vector2Int> deletePosList = new List<Vector2Int>();
+        List<ComboData> deletePosList = new List<ComboData>();
         for (var i = FIELD_HEIGHT - 1; i >= 0; i--)
         {
             for (var j = 0; j < FILED_WIDTH; j++)
@@ -804,7 +818,9 @@ public class UnitFieldData
                 var unit = Units[i, j];
                 if ((unit.CurrentColor & ColorData.White) == ColorData.White)
                 {
-                    deletePosList.Add(new Vector2Int(j, i));
+                    var combo = new ComboData();
+                    combo.Pos = new Vector2Int(j, i);
+                    deletePosList.Add(combo);
                     unit.InitData();
                 }
             }
