@@ -18,7 +18,7 @@ public class InputManager
     {
         GameManagerState state = GameManager.Instance.CurrentState;
 
-        if (state == GameManagerState.Input)
+        if (state == GameManagerState.Game)
         {
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Joystick2Button2))
             {
