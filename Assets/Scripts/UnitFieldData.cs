@@ -437,7 +437,7 @@ public class UnitFieldData
     /// 指定した座標がフィールドからはみ出しているかどうか。
     /// はみ出していたらtrueを返す。
     /// </summary>
-    private bool IsOutOfField(int x, int y)
+    public bool IsOutOfField(int x, int y)
     {
         return x < 0 || x >= FILED_WIDTH || y < 0 || y >= FIELD_HEIGHT;
     }
@@ -1006,10 +1006,11 @@ public class UnitFieldData
                 }
 
                 int predictPos = FIELD_HEIGHT - 1;
-                int y = i + 1;
+                int x = CurrentMino.Pos.x + j;
+                int y = CurrentMino.Pos.y + i + 1;
                 for (; y < FIELD_HEIGHT; y++)
                 {
-                    var unit = Units[y, j];
+                    var unit = Units[y, x];
                     if ((minoUnit.CurrentColor & unit.CurrentColor) != ColorData.None)
                     {
                         predictPos = y - 1;
@@ -1017,7 +1018,7 @@ public class UnitFieldData
                     }
                 }
 
-                list.Add(new Vector2Int(j, y));
+                list.Add(new Vector2Int(x, predictPos));
             }
         }
         return list;
