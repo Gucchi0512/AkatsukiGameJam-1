@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7cd26b2608fef4b9ea8be46a13b359, type: 3}
+  m_Name: MinoGenerateRoundData_NonLaser
+  m_EditorClassIdentifier: 
+  NormalList:
+  - {fileID: 11400000, guid: 736dc17ee6c4d7e4fb157f3428ff285b, type: 2}
+  - {fileID: 11400000, guid: 8f4c7811ba47e0a49a56a9da2302886e, type: 2}
+  - {fileID: 11400000, guid: 640887039e2c41843958636d9eca3064, type: 2}
+  - {fileID: 11400000, guid: 70bdaabf26287f04e850873fec59dcb6, type: 2}
+  - {fileID: 11400000, guid: a81e7836d6f79f144ab981509bdb7a20, type: 2}
+  - {fileID: 11400000, guid: d7e4d9c0cdef1a647938f5a0309901d6, type: 2}
+  - {fileID: 11400000, guid: 6c1b493d524d8d04aabfb8b3eca7dd44, type: 2}
+  - {fileID: 11400000, guid: 21039eb3f25920c478881738d9c15661, type: 2}
+  - {fileID: 11400000, guid: 1fda36ae95ca22b4cb9f3c73f66562eb, type: 2}
+  - {fileID: 11400000, guid: 480450c72b2276c4e858b5cf3b60f3ec, type: 2}
+  - {fileID: 11400000, guid: 8d6f5e43d1e969b4687239f3dc9ea1a8, type: 2}
+  - {fileID: 11400000, guid: 68916698463bdba439944d8e4e50844c, type: 2}
+  LaserList: []

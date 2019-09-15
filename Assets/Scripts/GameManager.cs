@@ -15,14 +15,21 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GridColorManager m_GridColorManager;
 
-    public GridColorManager GridColorManager { get { return m_GridColorManager; } }
+    [SerializeField]
+    private bool m_IsSinglePlayMode;
+
+    [SerializeField]
+    private MinoGenerateRoundData m_MinoGenerateRoundData;
+    public MinoGenerateRoundData MinoGenerateRoundData => m_MinoGenerateRoundData;
+
+    public GridColorManager GridColorManager => m_GridColorManager;
     public InputManager InputManager { get; private set; }
     public LogicManager LogicManager { get; private set; }
 
     public GameManagerState CurrentState { get; private set; }
     private GameManagerState m_RequestedState;
 
-    public bool IsSinglePlay { get; private set; }
+    public bool IsSinglePlay => m_IsSinglePlayMode;
 
     private Action<int> m_GameStartCountDownCallBack;
     public void AddGameStartCountDownCallBack(Action<int> action)
@@ -68,8 +75,6 @@ public class GameManager : MonoBehaviour
 
     private void OnAwake()
     {
-        IsSinglePlay = PlayerPrefs.GetInt(ConstKeys.IS_SINGLE_PLAY_MODE_KEY, 0) == 0;
-
         InputManager = new InputManager();
         LogicManager = new LogicManager();
     }
