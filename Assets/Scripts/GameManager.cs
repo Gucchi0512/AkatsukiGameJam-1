@@ -204,7 +204,6 @@ public class GameManager : MonoBehaviour
         var playerState = LogicManager.FieldDataPlayer1.CurrentState;
         if (playerState == UnitFieldState.GameOver || playerState == UnitFieldState.TimeUp)
         {
-            Debug.LogWarning(playerState);
             RequestState(GameManagerState.GameEnd);
         }
 
