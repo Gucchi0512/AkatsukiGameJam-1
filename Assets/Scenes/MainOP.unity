@@ -3254,6 +3254,9 @@ MonoBehaviour:
   deleteEff: {fileID: 1226131656}
   renderTex: {fileID: 8576665750561482078, guid: fe67c1e429bb87344986486d3d414cc7,
     type: 3}
+  comboText: {fileID: 4261945609721890216, guid: f325cd8e0d4a9cd4694c29e21800e2e6,
+    type: 3}
+  textOffset: {x: 0, y: 3, z: 0}
 --- !u!4 &416539421
 Transform:
   m_ObjectHideFlags: 0
@@ -16082,12 +16085,32 @@ PrefabInstance:
     - target: {fileID: 7653115612125449043, guid: bad6478f7810453428abfdbe3307e259,
         type: 3}
       propertyPath: InitialModule.startSize.minScalar
-      value: 800
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 7653115612125449043, guid: bad6478f7810453428abfdbe3307e259,
         type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 1000
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 7653115612125449043, guid: bad6478f7810453428abfdbe3307e259,
+        type: 3}
+      propertyPath: stopAction
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7653115612125449043, guid: bad6478f7810453428abfdbe3307e259,
+        type: 3}
+      propertyPath: ShapeModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7653115612125449043, guid: bad6478f7810453428abfdbe3307e259,
+        type: 3}
+      propertyPath: SizeModule.curve.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7653115612125449044, guid: bad6478f7810453428abfdbe3307e259,
+        type: 3}
+      propertyPath: m_MaxParticleSize
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bad6478f7810453428abfdbe3307e259, type: 3}
