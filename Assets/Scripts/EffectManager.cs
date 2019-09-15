@@ -10,8 +10,13 @@ public class EffectManager : MonoBehaviour
     public GameObject deleteEff;
     public GameObject renderTex;
     public GameObject comboText;
+
+    private AudioSource seSource;
     private Vector3 textOffset;
 
+    private void Start() {
+        seSource = GetComponent<AudioSource>();
+    }
     public void OnDeleteWhiteUnit(GameObject grid, int combo) {
         string text = combo.ToString() + "Combo!!";
         Text combotxt = comboText.GetComponent<Text>();
@@ -20,6 +25,7 @@ public class EffectManager : MonoBehaviour
         GameObject eff = (GameObject)Instantiate(renderTex, grid.transform.position, Quaternion.identity);
         eff.transform.SetParent(grid.transform);
         deleteEff.GetComponent<ParticleSystem>().Emit(3);
+        seSource.Play();
         Destroy(eff, 2);
         if (combo > 0) {
             GameObject comboTextObj = (GameObject)Instantiate(comboText, grid.transform.position + textOffset, Quaternion.identity);

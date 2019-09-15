@@ -14,16 +14,18 @@ public class GridColorManager : MonoBehaviour {
     public GameObject[] unitLineNextNext;
     public EffectManager effectManager;
     public Text Score;
-    public Image lasar;
+    public Image laser;
 
 
     [SerializeField] private GridController[,] m_grids;
     [SerializeField] private Image[,] m_nextGrid;
     [SerializeField] private Image[,] m_nextNextGrid;
     private UnitFieldData m_unitFieldData => unitFieldData;
+    private GameObject m_gridBG;
 
     // Start is called before the first frame update
     public void OnStart() {
+        m_gridBG = GameObject.FindGameObjectWithTag("GridBG");
         m_grids = new GridController[UnitFieldData.FIELD_HEIGHT - UnitFieldData.FIELD_TOP_OFFSET, UnitFieldData.FILED_WIDTH];
         m_nextGrid = new Image[MinoData.MINO_HEIGHT, MinoData.MINO_WIDTH];
         m_nextNextGrid = new Image[MinoData.MINO_HEIGHT, MinoData.MINO_WIDTH];
@@ -72,11 +74,11 @@ public class GridColorManager : MonoBehaviour {
             case GameManagerState.GameStart:
             if (this.gameObject.tag == "Player1") {
                 unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer1;
-            } else {
+            } else if (this.gameObject.tag == "Player2"){
                 unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer2;
             }
             unitFieldData.AddStartStateAction(EffectPlay);
-            unitFieldData.AddStartStateAction(LasarPlay);
+            unitFieldData.AddStartStateAction(LaserPlay);
             break;
             case GameManagerState.Input:
             break;
@@ -213,9 +215,19 @@ public class GridColorManager : MonoBehaviour {
         }
     }
 
-    public void LasarPlay() {
+    public void LaserPlay() {
         if(unitFieldData.CurrentState == UnitFieldState.StartLaser) {
+            List<LaserPositionData> list = unitFieldData.GetLaserPositionDataList();
+            foreach(var item in list) {
+                int posX = item.Pos.x;
+                int posY = item.Pos.y-UnitFieldData.FIELD_TOP_OFFSET;
 
+                GameObject laserObj = (GameObject)Instantiate(laser.gameObject, m_grids[posY, posX].gameObject.transform.position, Quaternion.identity);
+                laserObj.transform.parent = m_gridBG.transform;
+                laserObj.GetComponent<AudioSource>()?.Play();
+                Destroy(laserObj, 1);
+            }
+            
         }
     }
 }
