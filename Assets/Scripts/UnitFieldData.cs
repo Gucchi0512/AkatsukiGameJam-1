@@ -535,11 +535,11 @@ public class UnitFieldData
                         new Vector2Int(j, i), new Vector2Int(actX, actY), minoUnit.CurrentColor, fieldUnit.CurrentColor);
                     if (fieldUnit.CurrentColor != ColorData.None)
 
-                    if (fieldUnit.CurrentColor != ColorData.None)
+                        if (fieldUnit.CurrentColor != ColorData.None)
 
-                    {
-                        return false;
-                    }
+                        {
+                            return false;
+                        }
                 }
                 catch (System.Exception)
                 {
@@ -1011,5 +1011,39 @@ public class UnitFieldData
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// ミノの落下予測地点座標のリストを取得する
+    /// </summary>
+    public List<Vector2Int> GetPredictionDropPosList()
+    {
+        var list = new List<Vector2Int>();
+        for (var i = 0; i < MinoData.MINO_HEIGHT; i++)
+        {
+            for (var j = 0; j < MinoData.MINO_WIDTH; j++)
+            {
+                var minoUnit = CurrentMino.Units[i, j];
+                if (minoUnit.CurrentColor == ColorData.None)
+                {
+                    continue;
+                }
+
+                int predictPos = FIELD_HEIGHT - 1;
+                int y = i + 1;
+                for (; y < FIELD_HEIGHT; y++)
+                {
+                    var unit = Units[y, j];
+                    if ((minoUnit.CurrentColor & unit.CurrentColor) != ColorData.None)
+                    {
+                        predictPos = y - 1;
+                        break;
+                    }
+                }
+
+                list.Add(new Vector2Int(j, y));
+            }
+        }
+        return list;
     }
 }
