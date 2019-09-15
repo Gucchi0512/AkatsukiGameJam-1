@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public const int GAME_START_COUNT_DOWN_TIME = 3;
-    public const float GAME_TIME = 120;
+    public const float GAME_TIME = 60;
     public const int GAME_OVER_TIME = 3;
     public const int SCORE_BASE_POINT = 100;
     public const int SCORE_COMBO_POINT = 50;
@@ -91,6 +91,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        m_IsSinglePlayMode = PlayerPrefs.GetInt(ConstKeys.IS_SINGLE_PLAY_MODE_KEY, 0) == 0;
         CurrentState = GameManagerState.None;
         RequestState(GameManagerState.GameStart);
 
@@ -273,8 +274,11 @@ public class GameManager : MonoBehaviour
             if (!IsSinglePlay)
             {
                 JudgeWinner();
+            } else
+            {
+                PlayerPrefs.SetInt(ConstKeys.SCORE, LogicManager.FieldDataPlayer1.Score);
             }
-            SceneManager.LoadScene("Title");
+            SceneManager.LoadScene("Result");
         }
     }
 
