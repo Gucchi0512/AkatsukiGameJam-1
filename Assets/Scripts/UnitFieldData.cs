@@ -300,9 +300,9 @@ public class UnitFieldData
                 {
                     // フィールド上のブロックが存在すればアウト
                     var fieldUnit = Units[actY, actX];
-                    Debug.LogFormat("CheckMinoProtrude: minoPos:{0} fieldPos:{1}, minoColor:{2}, fieldColor:{3}",
+                    /*Debug.LogFormat("CheckMinoProtrude: minoPos:{0} fieldPos:{1}, minoColor:{2}, fieldColor:{3}",
                         new Vector2Int(j, i), new Vector2Int(actX, actY), minoUnit.CurrentColor, fieldUnit.CurrentColor);
-                    if (fieldUnit.CurrentColor != ColorData.None)
+                    */if (fieldUnit.CurrentColor != ColorData.None)
                     {
                         return false;
                     }

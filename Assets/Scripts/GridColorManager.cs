@@ -10,6 +10,7 @@ public class GridColorManager : MonoBehaviour {
     public GameObject[] unitLineField;
     public GameObject[] unitLineNext;
     public GameObject[] unitLineNextNext;
+    public EffectManager effectManager;
 
     [SerializeField] private Image[,] m_grids;
     [SerializeField] private Image[,] m_nextGrid;
@@ -45,12 +46,13 @@ public class GridColorManager : MonoBehaviour {
 
     // Update is called once per frame
     public void OnUpdate() {
-        //var gameState = GameManager.Instance.CurrentState;
-
+        var gameState = GameManager.Instance.CurrentState;
+        
         UpdateField();
         ShowCurrentMino();
         ShowNextMino();
-
+        
+        
     }
 
     public void OnStartState() {
@@ -70,6 +72,16 @@ public class GridColorManager : MonoBehaviour {
             case GameManagerState.CheckGameOver:
             break;
             case GameManagerState.GameEnd:
+            break;
+            case GameManagerState.Disapper:
+            if (gameState == GameManagerState.Disapper) {
+                List<Vector2Int> whitePosList = unitFieldData.DeleteWhiteUnit();
+                Debug.Log(whitePosList);
+                foreach (var item in whitePosList) {
+                    var delGrid = m_grids[item.y-3, item.x].gameObject;
+                    effectManager.OnDeleteWhiteUnit(delGrid.transform.position);
+                }
+            }
             break;
         }
     }
@@ -110,7 +122,6 @@ public class GridColorManager : MonoBehaviour {
                 var nextNextGrid = m_nextNextGrid[height, width];
                 nextGrid.color = GridColorChange(nextMino.Units[height, width].GetDisplayColor());
                 nextNextGrid.color = GridColorChange(nextNextMino.Units[height, width].GetDisplayColor());
-                Debug.Log(nextGrid.color);
             }
         }
     }
