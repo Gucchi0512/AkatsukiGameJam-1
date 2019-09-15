@@ -51,8 +51,7 @@ public class GridColorManager : MonoBehaviour {
         UpdateField();
         ShowCurrentMino();
         ShowNextMino();
-        
-        
+        effectManager.OnDeleteWhiteUnit(m_grids[0, 0].gameObject);
     }
 
     public void OnStartState() {
@@ -75,12 +74,7 @@ public class GridColorManager : MonoBehaviour {
             break;
             case GameManagerState.Disapper:
             if (gameState == GameManagerState.Disapper) {
-                List<Vector2Int> whitePosList = unitFieldData.DeleteWhiteUnit();
-                Debug.Log(whitePosList);
-                foreach (var item in whitePosList) {
-                    var delGrid = m_grids[item.y-3, item.x].gameObject;
-                    effectManager.OnDeleteWhiteUnit(delGrid.transform.position);
-                }
+                
             }
             break;
         }
@@ -155,5 +149,13 @@ public class GridColorManager : MonoBehaviour {
             break;
         }
         return chColor;
+    }
+
+    private Vector3 ChangeWorldPosition(RectTransform rect) {
+        Vector2 screenpos = RectTransformUtility.WorldToScreenPoint(Camera.main, rect.position);
+        Vector3 result = Vector3.zero;
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(rect, screenpos, Camera.main, out result);
+        return result;
+
     }
 }

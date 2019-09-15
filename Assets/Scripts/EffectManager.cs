@@ -8,13 +8,12 @@ public class EffectManager : MonoBehaviour
 {
     //public GameObject rawImage;
     public GameObject deleteEff;
+    public GameObject renderTex;
 
-    public void OnDeleteWhiteUnit(Vector3 pos) {
-        var ray = RectTransformUtility.ScreenPointToRay(Camera.main, pos);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
-            GameObject eff = Instantiate(deleteEff, pos, Quaternion.identity);
-            eff.GetComponent<ParticleSystem>().Play();
-        }
+    public void OnDeleteWhiteUnit(GameObject grid) {
+        
+        GameObject eff = (GameObject)Instantiate(renderTex, grid.transform.position, Quaternion.identity);
+        eff.transform.parent = grid.transform;
+        deleteEff.GetComponent<ParticleSystem>().Play();
     }
 }
