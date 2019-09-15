@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 
 public class GridColorManager : MonoBehaviour {
@@ -42,6 +43,7 @@ public class GridColorManager : MonoBehaviour {
                 m_nextNextGrid[i, childIndex] = child.gameObject.GetComponent<Image>();
             }
         }
+        
     }
 
     // Update is called once per frame
@@ -51,7 +53,7 @@ public class GridColorManager : MonoBehaviour {
         UpdateField();
         ShowCurrentMino();
         ShowNextMino();
-        effectManager.OnDeleteWhiteUnit(m_grids[0, 0].gameObject);
+        //effectManager.OnDeleteWhiteUnit(m_grids[0, 0].gameObject);
     }
 
     public void OnStartState() {
@@ -61,6 +63,7 @@ public class GridColorManager : MonoBehaviour {
             break;
             case GameManagerState.GameStart:
             unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer1;
+            unitFieldData.AddStartStateAction(EffectPlay);
             break;
             case GameManagerState.Input:
             break;
@@ -157,5 +160,19 @@ public class GridColorManager : MonoBehaviour {
         RectTransformUtility.ScreenPointToWorldPointInRectangle(rect, screenpos, Camera.main, out result);
         return result;
 
+    }
+
+    public void EffectPlay() {
+        if (unitFieldData.CurrentState == UnitFieldState.Delete) {
+            if (unitFieldData.ComboDataList != null) {
+                List<ComboData> dataList = unitFieldData.ComboDataList;
+                foreach(var item in dataList) {
+                    int posX = item.Pos.x;
+                    int posY = item.Pos.y-UnitFieldData.FIELD_TOP_OFFSET;
+                    string combotext = item.ComboCount.ToString() + "Combo!!";
+                    effectManager.OnDeleteWhiteUnit(m_grids[posY, posX].gameObject, combotext);
+                }
+            }
+        }
     }
 }
