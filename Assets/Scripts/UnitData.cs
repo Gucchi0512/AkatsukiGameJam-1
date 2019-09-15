@@ -38,6 +38,10 @@ public class UnitData
 
     public void SetCurrentData(ColorData color, LaserState laserState)
     {
+        if (IsExistLaser() && laserState == LaserState.None)
+        {
+            Debug.LogFormat("c:{0}, l:{1}", color, laserState);
+        }
         CurrentColor = color;
         CurrentLaserState = laserState;
     }
