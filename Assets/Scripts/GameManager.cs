@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     public const int GAME_START_COUNT_DOWN_TIME = 3;
     public const float GAME_TIME = 120;
     public const int GAME_OVER_TIME = 3;
-
+    public const int SCORE_BASE_POINT = 100;
+    public const int SCORE_COMBO_POINT = 50;
 
     [SerializeField]
     private GridColorManager m_GridColorManager;
