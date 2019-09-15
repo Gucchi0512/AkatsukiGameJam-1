@@ -5368,9 +5368,10 @@ GameObject:
   - component: {fileID: 733193840351719250}
   - component: {fileID: 733193840351719252}
   - component: {fileID: 733193840351719251}
+  - component: {fileID: 3184348905513155444}
   m_Layer: 5
   m_Name: Gridbg
-  m_TagString: Untagged
+  m_TagString: GridBG
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5415,7 +5416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49803922}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -5431,6 +5432,19 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
+--- !u!114 &3184348905513155444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733193840351719249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1200242548, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 1
 --- !u!1 &733193840355566427
 GameObject:
   m_ObjectHideFlags: 0
@@ -9337,6 +9351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e98cce298c675f8408de047b77a7d911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minoTexture: {fileID: 0}
   unitLineField:
   - {fileID: 733193840751368978}
   - {fileID: 733193839890092890}
@@ -9365,6 +9380,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   effectManager: {fileID: 0}
+  Score: {fileID: 0}
+  laser: {fileID: 9073710678235922619, guid: db8c6c0451bc6ca428689f7e2ce7df75, type: 3}
 --- !u!1 &733193841169836072
 GameObject:
   m_ObjectHideFlags: 0
