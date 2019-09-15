@@ -132,6 +132,7 @@ public class GameManager : MonoBehaviour
             case GameManagerState.GameStart:
                 m_GameStartCountDown = GAME_START_COUNT_DOWN_TIME;
                 m_GameStartCountDownTime = 0;
+                RemainTime = GameManager.GAME_TIME;
                 break;
             case GameManagerState.Game:
                 Debug.Log("Game Start!");
