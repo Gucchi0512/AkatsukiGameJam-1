@@ -12,6 +12,7 @@ public class GridColorManager : MonoBehaviour {
     public GameObject[] unitLineNext;
     public GameObject[] unitLineNextNext;
     public EffectManager effectManager;
+    public Text Score;
 
     [SerializeField] private Image[,] m_grids;
     [SerializeField] private Image[,] m_nextGrid;
@@ -49,10 +50,11 @@ public class GridColorManager : MonoBehaviour {
     // Update is called once per frame
     public void OnUpdate() {
         var gameState = GameManager.Instance.CurrentState;
-        
         UpdateField();
         ShowCurrentMino();
         ShowNextMino();
+        Score.text = unitFieldData.Score.ToString();
+
     }
 
     public void OnStartState() {
@@ -174,6 +176,7 @@ public class GridColorManager : MonoBehaviour {
                     int posY = item.Pos.y - UnitFieldData.FIELD_TOP_OFFSET;
                     effectManager.OnDeleteWhiteUnit(m_grids[posY, posX].gameObject, item.ComboCount);
                 }
+                
             }
         }
     }
