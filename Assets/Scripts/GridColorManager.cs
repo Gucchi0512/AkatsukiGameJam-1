@@ -7,12 +7,15 @@ using UnityEngine.Events;
 
 public class GridColorManager : MonoBehaviour {
 
+    public Sprite minoTexture;
     public UnitFieldData unitFieldData;
     public GameObject[] unitLineField;
     public GameObject[] unitLineNext;
     public GameObject[] unitLineNextNext;
     public EffectManager effectManager;
     public Text Score;
+    public Image lasar;
+
 
     [SerializeField] private Image[,] m_grids;
     [SerializeField] private Image[,] m_nextGrid;
@@ -29,6 +32,8 @@ public class GridColorManager : MonoBehaviour {
             foreach (Transform child in unitLineField[i].transform) {
                 int childIndex = child.GetSiblingIndex();
                 m_grids[i, childIndex] = child.gameObject.GetComponent<Image>();
+                m_grids[i, childIndex].sprite = minoTexture;
+
             }
         }
         for (int i = 0; i < unitLineNext.Length; i++) {
@@ -36,12 +41,14 @@ public class GridColorManager : MonoBehaviour {
                 int childIndex = child.GetSiblingIndex();
                 var image = child.gameObject.GetComponent<Image>();
                 m_nextGrid[i, childIndex] = image;
+                m_nextGrid[i, childIndex].sprite = minoTexture;
             }
         }
         for (int i = 0; i < unitLineNextNext.Length; i++) {
             foreach (Transform child in unitLineNextNext[i].transform) {
                 int childIndex = child.GetSiblingIndex();
                 m_nextNextGrid[i, childIndex] = child.gameObject.GetComponent<Image>();
+                m_nextNextGrid[i, childIndex].sprite = minoTexture;
             }
         }
         
@@ -69,6 +76,7 @@ public class GridColorManager : MonoBehaviour {
                 unitFieldData = GameManager.Instance.LogicManager.FieldDataPlayer2;
             }
             unitFieldData.AddStartStateAction(EffectPlay);
+            unitFieldData.AddStartStateAction(LasarPlay);
             break;
             case GameManagerState.Input:
             break;
@@ -81,9 +89,6 @@ public class GridColorManager : MonoBehaviour {
             case GameManagerState.GameEnd:
             break;
             case GameManagerState.Disapper:
-            if (gameState == GameManagerState.Disapper) {
-                
-            }
             break;
         }
     }
@@ -159,14 +164,6 @@ public class GridColorManager : MonoBehaviour {
         return chColor;
     }
 
-    private Vector3 ChangeWorldPosition(RectTransform rect) {
-        Vector2 screenpos = RectTransformUtility.WorldToScreenPoint(Camera.main, rect.position);
-        Vector3 result = Vector3.zero;
-        RectTransformUtility.ScreenPointToWorldPointInRectangle(rect, screenpos, Camera.main, out result);
-        return result;
-
-    }
-
     public void EffectPlay() {
         if (unitFieldData.CurrentState == UnitFieldState.Delete) {
             if (unitFieldData.ComboDataList != null) {
@@ -178,6 +175,12 @@ public class GridColorManager : MonoBehaviour {
                 }
                 
             }
+        }
+    }
+
+    public void LasarPlay() {
+        if(unitFieldData.CurrentState == UnitFieldState.StartLaser) {
+
         }
     }
 }
