@@ -18,6 +18,12 @@ public class GameManager : MonoBehaviour
     private GridColorManager m_GridColorManagerP2;
 
     [SerializeField]
+    private GameObject m_TimeUpCanvas;
+
+    [SerializeField]
+    private GameObject m_GameOverCanvas;
+
+    [SerializeField]
     private bool m_IsSinglePlayMode;
 
     [SerializeField]
@@ -141,6 +147,31 @@ public class GameManager : MonoBehaviour
             case GameManagerState.GameEnd:
                 Debug.Log("Game End!");
                 m_GameOverTime = GAME_OVER_TIME;
+
+                if (IsSinglePlay)
+                {
+                    var p1State = LogicManager.FieldDataPlayer1.CurrentState;
+                    if (p1State == UnitFieldState.GameOver)
+                    {
+                        m_GameOverCanvas.SetActive(true);
+                    } else
+                    {
+                        m_TimeUpCanvas.SetActive(true);
+                    }
+                }
+                else
+                {
+                    var p1State = LogicManager.FieldDataPlayer1.CurrentState;
+                    var p2State = LogicManager.FieldDataPlayer2.CurrentState;
+                    if (p1State == UnitFieldState.GameOver || p2State == UnitFieldState.GameOver)
+                    {
+                        m_GameOverCanvas.SetActive(true);
+                    }
+                    else
+                    {
+                        m_TimeUpCanvas.SetActive(true);
+                    }
+                }
                 break;
         }
         LogicManager.OnStateState();
@@ -201,7 +232,7 @@ public class GameManager : MonoBehaviour
             m_GameStartCountDownTime = 1;
         }
         m_GridColorManagerP1.OnUpdate();
-        if(!IsSinglePlay) m_GridColorManagerP2.OnUpdate();
+        if (!IsSinglePlay) m_GridColorManagerP2.OnUpdate();
     }
 
     private void OnUpdateGame()
