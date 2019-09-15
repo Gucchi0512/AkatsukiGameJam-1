@@ -44,6 +44,8 @@ public class UnitFieldData
     /// </summary>
     private bool m_IsPlayer1;
 
+    private MinoGenerator m_MinoGenerator;
+
     private float m_AutoDropTimeCount;
 
     private int m_ComboCount;
@@ -70,9 +72,11 @@ public class UnitFieldData
             }
         }
 
-        CurrentMino = GenerateMinoData(false);
-        NextMino = GenerateMinoData(false);
-        NextNextMino = GenerateMinoData(false);
+        m_MinoGenerator = new MinoGenerator(GameManager.Instance.MinoGenerateRoundData);
+
+        CurrentMino = m_MinoGenerator.GenerateMino();
+        NextMino = m_MinoGenerator.GenerateMino();
+        NextNextMino = m_MinoGenerator.GenerateMino();
 
         m_AutoDropTimeCount = 0;
         ComboDataList = null;
@@ -339,7 +343,7 @@ public class UnitFieldData
             // ミノをずらして入力待ちに戻る
             CurrentMino = NextMino;
             NextMino = NextNextMino;
-            NextNextMino = GenerateMinoData(true);
+            NextNextMino = m_MinoGenerator.GenerateMino();
             CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
 
             RequestState(UnitFieldState.Input);
@@ -432,62 +436,6 @@ public class UnitFieldData
     #endregion
 
     #endregion
-
-    /// <summary>
-    /// ミノ生成(仮置き)
-    /// </summary>
-    private MinoData GenerateMinoData(bool isEnableSingleMino)
-    {
-        var mino = new MinoData();
-        ColorData color = ColorData.None;
-        switch (UnityEngine.Random.Range(0, 3))
-        {
-            case 0:
-                color = ColorData.Red;
-                break;
-            case 1:
-                color = ColorData.Green;
-                break;
-            case 2:
-                color = ColorData.Blue;
-                break;
-        }
-
-        MinoData.MinoShape shape;
-        if (isEnableSingleMino)
-        {
-            shape = (MinoData.MinoShape)UnityEngine.Random.Range(0, 3);
-        }
-        else
-        {
-            shape = (MinoData.MinoShape)UnityEngine.Random.Range(0, 2);
-        }
-        switch (shape)
-        {
-            case MinoData.MinoShape._4_1:
-                // 4×1のやつ
-                for (var i = 0; i < 4; i++)
-                {
-                    mino.Units[i, 1].SetCurrentData(color, LaserState.None);
-                }
-                break;
-            case MinoData.MinoShape._2_2:
-                // 2×2のやつ
-                for (var i = 0; i < 2; i++)
-                {
-                    for (var j = 0; j < 2; j++)
-                    {
-                        mino.Units[i + 1, j + 1].SetCurrentData(color, LaserState.None);
-                    }
-                }
-                break;
-            case MinoData.MinoShape._1_1:
-                mino.Units[1, 1].SetCurrentData(color, LaserState.Prepare);
-                break;
-        }
-
-        return mino;
-    }
 
     /// <summary>
     /// 指定した座標がフィールドからはみ出しているかどうか。
