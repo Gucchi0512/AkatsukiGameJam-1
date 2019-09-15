@@ -167,6 +167,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GridColorManagerP1: {fileID: 1320055855}
   m_GridColorManagerP2: {fileID: 71105308}
+  m_TimeUpCanvas: {fileID: 512517384735221844, guid: 07d85c8696a8b4149b7b1e17857810ef,
+    type: 3}
+  m_GameOverCanvas: {fileID: 5621465236722450303, guid: 40aac12bbdff2254684aa3b32c078d2f,
+    type: 3}
   m_IsSinglePlayMode: 0
   m_MinoGenerateRoundData: {fileID: 11400000, guid: 9d1f0578e9359734395a84b73e037717,
     type: 2}
