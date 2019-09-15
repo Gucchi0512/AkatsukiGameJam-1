@@ -46,6 +46,8 @@ public class UnitFieldData
 
     private float m_AutoDropTimeCount;
 
+    private int m_ComboCount;
+
     private Action m_StartStateAction;
     public void AddStartStateAction(Action action)
     {
@@ -75,6 +77,7 @@ public class UnitFieldData
         m_AutoDropTimeCount = 0;
         ComboDataList = null;
         CurrentMino.Pos = new Vector2Int((FILED_WIDTH - MinoData.MINO_HEIGHT) / 2, 0);
+        Score = 0;
     }
 
     public void OnStartState()
@@ -231,6 +234,7 @@ public class UnitFieldData
 
     private void OnStartStateAtGameInput()
     {
+        m_ComboCount = 0;
         m_AutoDropTimeCount = 0;
     }
 
@@ -823,10 +827,17 @@ public class UnitFieldData
                 var unit = Units[i, j];
                 if ((unit.CurrentColor & ColorData.White) == ColorData.White)
                 {
+                    var score = GameManager.SCORE_BASE_POINT + GameManager.SCORE_COMBO_POINT * m_ComboCount;
+                    Score += score;
+
                     var combo = new ComboData();
                     combo.Pos = new Vector2Int(j, i);
+                    combo.ComboCount = m_ComboCount;
+                    combo.Score = score;
                     deletePosList.Add(combo);
                     unit.InitData();
+
+                    m_ComboCount++;
                 }
             }
         }
