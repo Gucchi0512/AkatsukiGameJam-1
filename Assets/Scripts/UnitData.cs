@@ -58,6 +58,19 @@ public class UnitData
 
     public ColorData GetDisplayColor()
     {
+        if (CurrentLaserState != LaserState.None)
+        {
+            return CurrentColor;
+        }
+        else if (InputLaserState != LaserState.None)
+        {
+            return InputColor;
+        }
+        return CurrentColor | InputColor;
+    }
+
+    public ColorData GetOverrappedColor()
+    {
         return CurrentColor | InputColor;
     }
 
