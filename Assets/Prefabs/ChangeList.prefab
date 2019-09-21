@@ -587,7 +587,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9607843, g: 0.34901962, b: 0.85490197, a: 1}
+  m_Color: {r: 0.46218842, g: 0.9607843, b: 0.34901965, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -735,7 +735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9622642, g: 0.95686275, b: 0.34901962, a: 1}
+  m_Color: {r: 0.34901965, g: 0.65015507, b: 0.9607843, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -877,7 +877,7 @@ GameObject:
   m_Component:
   - component: {fileID: 610269402343939036}
   m_Layer: 5
-  m_Name: CMYW
+  m_Name: RGBW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -982,7 +982,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: C + M + Y = W
+  m_Text: R + G + B = W
 --- !u!1 &610269402609672089
 GameObject:
   m_ObjectHideFlags: 0
@@ -1267,7 +1267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.9647059, b: 1, a: 1}
+  m_Color: {r: 0.9811321, g: 0.35797593, b: 0.33784264, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
